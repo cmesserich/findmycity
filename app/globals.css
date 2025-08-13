@@ -3,24 +3,21 @@
 @tailwind utilities;
 
 /* ---- Light theme baseline ---- */
-:root {
-  color-scheme: light;
-}
+:root { color-scheme: light; }
 
 html, body {
   @apply min-h-screen bg-slate-50 text-slate-900 antialiased;
 }
 
-/* Typography defaults (kept subtle; your pages already add their own sizes) */
-h1 { @apply text-slate-900; }
-h2 { @apply text-slate-900; }
-p  { @apply text-slate-600; }
+/* Typography */
+h1, h2 { @apply text-slate-900; }
+p      { @apply text-slate-600; }
 
 /* Links + focus */
 a { @apply text-blue-600 hover:text-blue-700; }
 :focus-visible { @apply outline-none ring-2 ring-blue-500/40 rounded-md; }
 
-/* Nice defaults you can use anywhere (optional helpers) */
+/* Optional helpers */
 .input {
   @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2
          text-slate-900 placeholder-slate-400 shadow-sm
