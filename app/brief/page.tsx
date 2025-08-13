@@ -1,157 +1,161 @@
-import { getCity, spendingPower, fmtMoney, percentDelta } from "@/lib/compare";
+import { getCity, fmtMoney, spendingPower, percentDelta } from "@/lib/compare";
 import { normalizeSlug } from "@/lib/slug";
-import Checklist from "@/components/Checklist";
-
-
-export const dynamic = "force-dynamic";
+import PrintButton from "@/components/PrintButton";
+// import CopyLinkButton if you want a share button here too
+// import CopyLinkButton from "@/components/CopyLinkButton";
 
 type SearchParams = { [key: string]: string | string[] | undefined };
-const now = () => new Date().toLocaleDateString();
 
-type Section = { title: string; items: string[] };
+// Server Component (no event handlers here)
+export default async function BriefPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>; // 👈 Next 15: searchParams is async
+}) {
+  const params = await searchParams; // 👈 await before using
 
-export default function BriefPage({ searchParams }: { searchParams: SearchParams }) {
-  const a = getCity(normalizeSlug((searchParams.a as string) || ""));
-  const b = getCity(normalizeSlug((searchParams.b as string) || ""));
-  const salary = Number(searchParams.salary || 100000);
+  const aSlug = normalizeSlug(String(params.a ?? ""));
+  const bSlug = normalizeSlug(String(params.b ?? ""));
+  const salary = Number(params.salary ?? 100000);
+
+  const a = aSlug ? getCity(aSlug) : undefined;
+  const b = bSlug ? getCity(bSlug) : undefined;
 
   if (!a || !b || !Number.isFinite(salary)) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="text-2xl font-semibold">Relocation Brief</h1>
-        <p className="mt-4 text-gray-600">Missing/invalid parameters.</p>
-        <a href="/" className="mt-6 inline-block text-blue-600 underline">← Home</a>
+        <h1 className="text-2xl font-semibold">Missing or invalid parameters</h1>
+        <p className="mt-3 text-slate-600">
+          We need valid <code className="rounded bg-slate-100 px-1">a</code>,{" "}
+          <code className="rounded bg-slate-100 px-1">b</code>, and{" "}
+          <code className="rounded bg-slate-100 px-1">salary</code>.
+        </p>
+        <p className="mt-4">
+          <a className="underline" href="/">
+            Go back and try again from the homepage
+          </a>
+          {"  "}or{"  "}
+          <a className="underline" href="/wizard">
+            use the matcher
+          </a>
+          .
+        </p>
       </main>
     );
   }
 
   const spend = spendingPower(salary, a.rpp, b.rpp);
 
-  const sections: Section[] = [
-    {
-      title: "Salary & Costs",
-      items: [
-        `Your salary: ${fmtMoney(salary)}. In ${b.name}, that feels like ${fmtMoney(spend.destEquivalent)} (${(spend.deltaPct > 0 ? "+" : "") + spend.deltaPct.toFixed(1)}%).`,
-        `Affordability (RPP): ${a.rpp} → ${b.rpp}.`,
-        `Rent index: ${a.rentIndex} → ${b.rentIndex}.`,
-      ],
-    },
-    {
-      title: "Lifestyle & Vibes",
-      items: [
-        `Diversity index: ${a.diversityIndex.toFixed(2)} → ${b.diversityIndex.toFixed(2)}.`,
-        `Internet median speed: ${a.internetMbps} → ${b.internetMbps} Mbps.`,
-        `Amenities (per 10k): Parks ${a.parksPer10k} → ${b.parksPer10k}, Cafes ${a.cafesPer10k} → ${b.cafesPer10k}, Bars ${a.barsPer10k} → ${b.barsPer10k}.`,
-      ],
-    },
-    {
-      title: "Neighborhood Starter Pack",
-      items: [
-        `In ${b.name}: Start with three well-known areas (placeholders): Central, Northside, Riverside.`,
-        `In ${a.name}: If you stay, explore: Capitol, Heights, Lakeside.`,
-      ],
-    },
-    {
-      title: "First Week Plan & Links",
-      items: [
-        "Day 1–2: Tour 2 neighborhoods; get a 1-week coworking pass.",
-        "Day 3–4: Test gym/parks nearby; ride transit at commute time.",
-        "Day 5–7: Short-term rental in target area; walk evening routes.",
-        "Affiliates (placeholders): movingco.example, rentersins.example, fiberisp.example",
-      ],
-    },
+  const rows = [
+    { label: "Affordability (RPP, lower is cheaper)", a: a.rpp, b: b.rpp, better: "lower" as const },
+    { label: "Rent Index (higher is pricier)", a: a.rentIndex, b: b.rentIndex, better: "lower" as const },
+    { label: "Median Household Income", a: a.incomeMedian, b: b.incomeMedian, money: true, better: "higher" as const },
+    { label: "Diversity Index (0–1)", a: a.diversityIndex, b: b.diversityIndex, better: "higher" as const },
+    { label: "Internet Median Mbps", a: a.internetMbps, b: b.internetMbps, better: "higher" as const },
+    { label: "Parks per 10k", a: a.parksPer10k, b: b.parksPer10k, better: "higher" as const },
+    { label: "Cafes per 10k", a: a.cafesPer10k, b: b.cafesPer10k, better: "higher" as const },
+    { label: "Bars per 10k", a: a.barsPer10k, b: b.barsPer10k, better: "higher" as const },
   ];
 
-  const summaryRows = [
-    ["Affordability (RPP, lower is cheaper)", a.rpp, b.rpp, "lower"],
-    ["Rent Index (higher is pricier)", a.rentIndex, b.rentIndex, "lower"],
-    ["Median Household Income", a.incomeMedian, b.incomeMedian, "higher"],
-    ["Diversity Index (0–1)", a.diversityIndex, b.diversityIndex, "higher"],
-    ["Internet Median Mbps", a.internetMbps, b.internetMbps, "higher"],
-    ["Parks per 10k", a.parksPer10k, b.parksPer10k, "higher"],
-    ["Cafes per 10k", a.cafesPer10k, b.cafesPer10k, "higher"],
-    ["Bars per 10k", a.barsPer10k, b.barsPer10k, "higher"],
-  ] as const;
-
   return (
-    <main className="mx-auto max-w-3xl bg-white px-6 py-10 print:max-w-none print:bg-white print:px-0">
-      <header className="mb-6 border-b pb-4">
-        <h1 className="text-3xl font-semibold">Relocation Brief</h1>
-        <p className="mt-1 text-gray-500">
-          {a.name}, {a.state} → {b.name}, {b.state} • Generated {now()}
-        </p>
-        <button onClick={() => window.print()} className="mt-4 rounded border px-3 py-2 text-sm hover:bg-gray-50 print:hidden">
-          Print / Save as PDF
-        </button>
-      </header>
+    <main className="mx-auto max-w-5xl px-6 py-12 text-slate-900">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold">
+            {b.name}, {b.state} — Relocation brief
+          </h1>
+          <p className="mt-2 text-sm text-slate-600">
+            From {a.name}, {a.state} on{" "}
+            <strong className="text-slate-900">{fmtMoney(salary)}</strong>. Spending power in{" "}
+            {b.name}: <strong className="text-slate-900">{fmtMoney(spend.destEquivalent)}</strong>{" "}
+            (<span className={spend.deltaPct >= 0 ? "text-green-700" : "text-red-700"}>
+              {(spend.deltaPct > 0 ? "+" : "") + spend.deltaPct.toFixed(1)}%
+            </span>{" "}
+            vs {a.name}).
+          </p>
+        </div>
+        <div className="flex gap-2">
+          {/* Keep interactivity inside client components only */}
+          <PrintButton />
+          {/* <CopyLinkButton />  // optional share button if you want */}
+        </div>
+      </div>
 
-      <section className="mb-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border bg-gray-50 p-4">
-          <div className="text-xs uppercase text-gray-500">Salary</div>
-          <div className="mt-1 text-2xl font-semibold">{fmtMoney(salary)}</div>
-        </div>
-        <div className="rounded-lg border bg-gray-50 p-4">
-          <div className="text-xs uppercase text-gray-500">Feels like in {b.name}</div>
-          <div className="mt-1 text-2xl font-semibold">{fmtMoney(spend.destEquivalent)}</div>
-        </div>
-        <div className={`rounded-lg border bg-gray-50 p-4 ${spend.deltaPct>=0?"text-green-700":"text-red-700"}`}>
-          <div className="text-xs uppercase text-gray-500">Δ Spending power</div>
-          <div className="mt-1 text-2xl font-semibold">
-            {(spend.deltaPct > 0 ? "+" : "") + spend.deltaPct.toFixed(1)}%
+      {/* Summary cards */}
+      <section className="card p-6 avoid-break">
+        <h2 className="text-lg font-medium">Snapshot</h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div className="card-muted p-4">
+            <div className="text-xs uppercase tracking-wide text-slate-500">Spending power</div>
+            <div className="mt-2 text-2xl font-semibold">{fmtMoney(spend.destEquivalent)}</div>
+            <div className="mt-1 text-sm text-slate-600">
+              feels like in {b.name}
+            </div>
+          </div>
+          <div className="card-muted p-4">
+            <div className="text-xs uppercase tracking-wide text-slate-500">Housing snapshot</div>
+            <div className="mt-2 text-sm">
+              Rent index: <span className="font-medium">{a.rentIndex}</span> →{" "}
+              <span className="font-medium">{b.rentIndex}</span>
+            </div>
+            <div className="mt-1 text-sm">
+              Income: <span className="font-medium">{fmtMoney(a.incomeMedian)}</span> →{" "}
+              <span className="font-medium">{fmtMoney(b.incomeMedian)}</span>
+            </div>
+          </div>
+          <div className="card-muted p-4">
+            <div className="text-xs uppercase tracking-wide text-slate-500">Lifestyle</div>
+            <div className="mt-2 text-sm">Internet: <span className="font-medium">{b.internetMbps} Mbps</span></div>
+            <div className="mt-1 text-sm">Parks per 10k: <span className="font-medium">{b.parksPer10k}</span></div>
+            <div className="mt-1 text-sm">Cafes per 10k: <span className="font-medium">{b.cafesPer10k}</span></div>
           </div>
         </div>
       </section>
 
-      <section className="mb-8">
-        <h2 className="mb-2 text-lg font-semibold">Summary</h2>
+      {/* Mini table of key deltas for credibility */}
+      <section className="mt-6 card avoid-break">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
+          <table className="table">
             <thead>
-              <tr className="text-left text-gray-500">
-                <th className="border-b p-2">Metric</th>
-                <th className="border-b p-2">{a.name}</th>
-                <th className="border-b p-2">{b.name}</th>
-                <th className="border-b p-2">Δ (B vs A)</th>
+              <tr>
+                <th>Metric</th>
+                <th>{a.name}</th>
+                <th>{b.name}</th>
+                <th>Δ (B vs A)</th>
               </tr>
             </thead>
             <tbody>
-              {summaryRows.map(([label, av, bv, dir]) => {
-                const delta = percentDelta(av as number, bv as number);
-                const good = (dir === "lower" && delta < 0) || (dir === "higher" && delta > 0);
-                const fmt = (v: number) => (String(label).includes("Income") ? fmtMoney(v) : (v as number).toLocaleString());
+              {rows.map((r) => {
+                const delta = percentDelta(r.a as number, r.b as number);
+                const format = (v: number) => (r.money ? fmtMoney(v) : v.toLocaleString());
                 return (
-                  <tr key={String(label)} className="border-b last:border-b-0">
-                    <td className="p-2">{label}</td>
-                    <td className="p-2">{fmt(av as number)}</td>
-                    <td className="p-2">{fmt(bv as number)}</td>
-                    <td className={`p-2 ${good ? "text-green-700" : "text-red-700"}`}>
+                  <tr key={r.label}>
+                    <td className="text-slate-800">{r.label}</td>
+                    <td>{format(r.a as number)}</td>
+                    <td>{format(r.b as number)}</td>
+                    <td className={delta >= 0 ? "text-red-700" : "text-green-700"}>
                       {(delta > 0 ? "+" : "") + delta.toFixed(1)}%
                     </td>
                   </tr>
                 );
               })}
               <tr>
-                <td className="p-2">Climate</td>
-                <td className="p-2">{a.climate}</td>
-                <td className="p-2">{b.climate}</td>
-                <td className="p-2 text-gray-400">—</td>
+                <td>Climate</td>
+                <td>{a.climate}</td>
+                <td>{b.climate}</td>
+                <td className="text-slate-400">—</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
-      <section className="mt-8">
-        <Checklist keyId={`${a.slug}-${b.slug}`} />
-      </section>
 
-      {sections.map((sec) => (
-        <section key={sec.title} className="mb-6 break-inside-avoid">
-          <h2 className="mb-2 text-lg font-semibold">{sec.title}</h2>
-          <ul className="list-disc space-y-1 pl-6 text-sm text-gray-800">
-            {sec.items.map((t, i) => <li key={i}>{t}</li>)}
-          </ul>
-        </section>
-      ))}
+      {/* Actions */}
+      <div className="mt-8">
+        <a href={`/compare?a=${a.slug}&b=${b.slug}&salary=${salary}`} className="btn-outline no-print">
+          Back to comparison
+        </a>
+      </div>
     </main>
   );
 }
