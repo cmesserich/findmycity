@@ -3,12 +3,41 @@
 @tailwind utilities;
 
 /* ---- Light theme baseline ---- */
-:root { color-scheme: light; }
-
-html, body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+:root {
+  color-scheme: light;
 }
 
-/* Optional: nicer link + focus styles */
+html, body {
+  @apply min-h-screen bg-slate-50 text-slate-900 antialiased;
+}
+
+/* Typography defaults (kept subtle; your pages already add their own sizes) */
+h1 { @apply text-slate-900; }
+h2 { @apply text-slate-900; }
+p  { @apply text-slate-600; }
+
+/* Links + focus */
 a { @apply text-blue-600 hover:text-blue-700; }
 :focus-visible { @apply outline-none ring-2 ring-blue-500/40 rounded-md; }
+
+/* Nice defaults you can use anywhere (optional helpers) */
+.input {
+  @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2
+         text-slate-900 placeholder-slate-400 shadow-sm
+         focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30;
+}
+.btn {
+  @apply inline-flex items-center justify-center rounded-md bg-slate-900
+         px-4 py-2 text-white shadow-sm hover:bg-slate-800
+         focus:outline-none focus:ring-2 focus:ring-blue-500/40;
+}
+.btn-outline {
+  @apply inline-flex items-center justify-center rounded-md border border-slate-300
+         bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50;
+}
+.card        { @apply rounded-2xl border border-slate-200 bg-white shadow-sm; }
+.card-muted  { @apply rounded-xl  border border-slate-200 bg-slate-50; }
+.table       { @apply w-full border-collapse text-sm; }
+.table th    { @apply border-b border-slate-200 p-3 text-left text-slate-600; }
+.table td    { @apply border-b border-slate-100  p-3 text-slate-900; }
+.table tr:last-child td { @apply border-b-0; }
