@@ -1,98 +1,62 @@
-import { CITIES } from '@/lib/data/cities';
+import Link from "next/link";
 
-export default function HomePage() {
+const PRESETS = [
+  { a: "washington-dc", b: "omaha", label: "DC → Omaha" },
+  { a: "new-york-city", b: "miami", label: "NYC → Miami" },
+  { a: "san-diego", b: "denver", label: "San Diego → Denver" },
+  { a: "seattle", b: "austin", label: "Seattle → Austin" },
+];
+
+export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Find My City</h1>
-            <p className="text-xl text-gray-300 mb-2">
-              Compare cities and see how your salary translates
-            </p>
-            <p className="text-gray-400">
-              Perfect for remote workers looking to relocate
-            </p>
-          </div>
+    <main className="mx-auto max-w-3xl px-6 py-16">
+      <h1 className="text-4xl font-semibold tracking-tight">Find My Next City</h1>
+      <p className="mt-3 text-lg text-gray-600">
+        Compare two US cities and see how your salary and lifestyle might change.
+      </p>
 
-          <div className="bg-gray-800 rounded-lg p-8 shadow-xl">
-            <form action="/compare" method="GET" className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="cityA" className="block text-sm font-medium text-gray-300 mb-2">
-                    Current City
-                  </label>
-                  <input
-                    type="text"
-                    id="cityA"
-                    name="a"
-                    defaultValue="washington-dc"
-                    required
-                    list="cities"
-                    className="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter city name..."
-                  />
-                </div>
+      {/* list of available slugs for autocomplete */}
+      <datalist id="city-slugs">
+        {[
+          "washington-dc","omaha","austin","denver","new-york-city","miami","seattle","phoenix","boston",
+          "nashville","portland","atlanta","san-diego","chicago","tampa",
+        ].map(s => <option key={s} value={s} />)}
+      </datalist>
 
-                <div>
-                  <label htmlFor="cityB" className="block text-sm font-medium text-gray-300 mb-2">
-                    Potential City
-                  </label>
-                  <input
-                    type="text"
-                    id="cityB"
-                    name="b"
-                    defaultValue="omaha"
-                    required
-                    list="cities"
-                    className="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter city name..."
-                  />
-                </div>
-              </div>
+      <form className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3" action="/compare" aria-label="City comparison form">
+        <div>
+          <label className="block text-sm font-medium">City A (slug)</label>
+          <input name="a" list="city-slugs" defaultValue="washington-dc" required
+                 className="mt-1 w-full rounded border px-3 py-2" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">City B (slug)</label>
+          <input name="b" list="city-slugs" defaultValue="omaha" required
+                 className="mt-1 w-full rounded border px-3 py-2" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Salary (USD)</label>
+          <input name="salary" type="number" min="0" step="1000" defaultValue="100000" required
+                 className="mt-1 w-full rounded border px-3 py-2" />
+        </div>
+        <div className="sm:col-span-3">
+          <button className="w-full rounded bg-black px-4 py-2 text-white hover:opacity-90">Compare</button>
+        </div>
+      </form>
 
-              <div>
-                <label htmlFor="salary" className="block text-sm font-medium text-gray-300 mb-2">
-                  Annual Salary
-                </label>
-                <input
-                  type="number"
-                  id="salary"
-                  name="salary"
-                  defaultValue="100000"
-                  required
-                  min="1"
-                  step="1000"
-                  className="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your annual salary..."
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-              >
-                Compare Cities
-              </button>
-            </form>
-
-            <datalist id="cities">
-              {CITIES.map(city => (
-                <option key={city.slug} value={city.slug}>
-                  {city.name}, {city.state}
-                </option>
-              ))}
-            </datalist>
-          </div>
-
-          <div className="mt-8 text-center text-gray-400 text-sm">
-            <p className="mb-2">Available cities:</p>
-            <p className="text-xs leading-relaxed">
-              {CITIES.map(city => `${city.name}, ${city.state}`).join(' • ')}
-            </p>
-          </div>
+      <div className="mt-10">
+        <h2 className="text-sm font-medium text-gray-500">Popular comparisons</h2>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {PRESETS.map(p => (
+            <Link key={p.label}
+              className="rounded-lg border border-black/10 bg-white px-4 py-3 shadow hover:shadow-md"
+              href={`/compare?a=${p.a}&b=${p.b}&salary=100000`}
+            >
+              {p.label}
+            </Link>
+          ))}
         </div>
       </div>
-    </div>
+    </main>
   );
 }
