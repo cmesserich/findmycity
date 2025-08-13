@@ -1,42 +1,14 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ---- Light theme baseline ---- */
+:root { color-scheme: light; }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html, body {
+  @apply bg-slate-50 text-slate-900 antialiased;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-/* subtle background for app pages (not printed) */
-body {
-  background:
-    radial-gradient(60% 40% at 20% 0%, rgba(14,165,233,0.10), transparent 60%),
-    radial-gradient(40% 30% at 80% 10%, rgba(34,211,238,0.10), transparent 60%),
-    #0b0b0d;
-}
-
-/* brief page print styles */
-@media print {
-  body { background: #fff !important; }
-  main { color: #000 !important; }
-  a, button { display: none !important; }
-  table { page-break-inside: avoid; }
-  section { break-inside: avoid; }
-}
+/* Optional: nicer link + focus styles */
+a { @apply text-blue-600 hover:text-blue-700; }
+:focus-visible { @apply outline-none ring-2 ring-blue-500/40 rounded-md; }
