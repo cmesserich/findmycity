@@ -12,8 +12,12 @@ export default function Home() {
     <main className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="text-4xl font-semibold tracking-tight text-slate-900">Find My Next City</h1>
       <p className="mt-3 text-lg text-slate-600">
-        Compare two US cities and see how your salary and lifestyle might change.
-      </p>
+  Compare two US cities and see how your salary and lifestyle might change.
+</p>
+<p className="mt-2 text-sm">
+  Not sure where to go? <a className="underline" href="/wizard">Try the matcher →</a>
+</p>
+
 
       <datalist id="city-slugs">
         {[
