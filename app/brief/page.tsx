@@ -6,6 +6,8 @@ export const dynamic = "force-dynamic";
 type SearchParams = { [key: string]: string | string[] | undefined };
 const now = () => new Date().toLocaleDateString();
 
+type Section = { title: string; items: string[] };
+
 export default function BriefPage({ searchParams }: { searchParams: SearchParams }) {
   const a = getCity(normalizeSlug((searchParams.a as string) || ""));
   const b = getCity(normalizeSlug((searchParams.b as string) || ""));
@@ -23,28 +25,40 @@ export default function BriefPage({ searchParams }: { searchParams: SearchParams
 
   const spend = spendingPower(salary, a.rpp, b.rpp);
 
-  const bullets = [
-    ["Salary & Costs", [
-      `Your salary: ${fmtMoney(salary)}. In ${b.name}, that feels like ${fmtMoney(spend.destEquivalent)} (${(spend.deltaPct>0?"+":"") + spend.deltaPct.toFixed(1)}%).`,
-      `Affordability (RPP): ${a.rpp} → ${b.rpp}.`,
-      `Rent index: ${a.rentIndex} → ${b.rentIndex}.`,
-    ]],
-    ["Lifestyle & Vibes", [
-      `Diversity index: ${a.diversityIndex.toFixed(2)} → ${b.diversityIndex.toFixed(2)}.`,
-      `Internet median speed: ${a.internetMbps} → ${b.internetMbps} Mbps.`,
-      `Amenities (per 10k): Parks ${a.parksPer10k} → ${b.parksPer10k}, Cafes ${a.cafesPer10k} → ${b.cafesPer10k}, Bars ${a.barsPer10k} → ${b.barsPer10k}.`,
-    ]],
-    ["Neighborhood Starter Pack", [
-      `City ${b.name}: Start with three well-known areas (placeholders): Central, Northside, Riverside.`,
-      `City ${a.name}: If you stay, explore: Capitol, Heights, Lakeside.`,
-    ]],
-    ["First Week Plan & Links", [
-      "Day 1–2: Tour 2 neighborhoods; get a 1-week coworking pass.",
-      "Day 3–4: Test gym/parks nearby; ride transit at commute time.",
-      "Day 5–7: Short-term rental in target area; walk evening routes.",
-      "Affiliates (placeholders): movingco.example, rentersins.example, fiberisp.example",
-    ]],
-  ] as const;
+  const sections: Section[] = [
+    {
+      title: "Salary & Costs",
+      items: [
+        `Your salary: ${fmtMoney(salary)}. In ${b.name}, that feels like ${fmtMoney(spend.destEquivalent)} (${(spend.deltaPct > 0 ? "+" : "") + spend.deltaPct.toFixed(1)}%).`,
+        `Affordability (RPP): ${a.rpp} → ${b.rpp}.`,
+        `Rent index: ${a.rentIndex} → ${b.rentIndex}.`,
+      ],
+    },
+    {
+      title: "Lifestyle & Vibes",
+      items: [
+        `Diversity index: ${a.diversityIndex.toFixed(2)} → ${b.diversityIndex.toFixed(2)}.`,
+        `Internet median speed: ${a.internetMbps} → ${b.internetMbps} Mbps.`,
+        `Amenities (per 10k): Parks ${a.parksPer10k} → ${b.parksPer10k}, Cafes ${a.cafesPer10k} → ${b.cafesPer10k}, Bars ${a.barsPer10k} → ${b.barsPer10k}.`,
+      ],
+    },
+    {
+      title: "Neighborhood Starter Pack",
+      items: [
+        `In ${b.name}: Start with three well-known areas (placeholders): Central, Northside, Riverside.`,
+        `In ${a.name}: If you stay, explore: Capitol, Heights, Lakeside.`,
+      ],
+    },
+    {
+      title: "First Week Plan & Links",
+      items: [
+        "Day 1–2: Tour 2 neighborhoods; get a 1-week coworking pass.",
+        "Day 3–4: Test gym/parks nearby; ride transit at commute time.",
+        "Day 5–7: Short-term rental in target area; walk evening routes.",
+        "Affiliates (placeholders): movingco.example, rentersins.example, fiberisp.example",
+      ],
+    },
+  ];
 
   const summaryRows = [
     ["Affordability (RPP, lower is cheaper)", a.rpp, b.rpp, "lower"],
@@ -78,10 +92,10 @@ export default function BriefPage({ searchParams }: { searchParams: SearchParams
           <div className="text-xs uppercase text-gray-500">Feels like in {b.name}</div>
           <div className="mt-1 text-2xl font-semibold">{fmtMoney(spend.destEquivalent)}</div>
         </div>
-        <div className="rounded-lg border bg-gray-50 p-4">
+        <div className={`rounded-lg border bg-gray-50 p-4 ${spend.deltaPct>=0?"text-green-700":"text-red-700"}`}>
           <div className="text-xs uppercase text-gray-500">Δ Spending power</div>
-          <div className={`mt-1 text-2xl font-semibold ${spend.deltaPct>=0?"text-green-600":"text-red-600"}`}>
-            {(spend.deltaPct>0?"+":"") + spend.deltaPct.toFixed(1)}%
+          <div className="mt-1 text-2xl font-semibold">
+            {(spend.deltaPct > 0 ? "+" : "") + spend.deltaPct.toFixed(1)}%
           </div>
         </div>
       </section>
@@ -102,13 +116,15 @@ export default function BriefPage({ searchParams }: { searchParams: SearchParams
               {summaryRows.map(([label, av, bv, dir]) => {
                 const delta = percentDelta(av as number, bv as number);
                 const good = (dir === "lower" && delta < 0) || (dir === "higher" && delta > 0);
-                const fmt = (v: number) => (label.includes("Income") ? fmtMoney(v) : (v as number).toLocaleString());
+                const fmt = (v: number) => (String(label).includes("Income") ? fmtMoney(v) : (v as number).toLocaleString());
                 return (
-                  <tr key={label} className="border-b last:border-b-0">
+                  <tr key={String(label)} className="border-b last:border-b-0">
                     <td className="p-2">{label}</td>
                     <td className="p-2">{fmt(av as number)}</td>
                     <td className="p-2">{fmt(bv as number)}</td>
-                    <td className={`p-2 ${good ? "text-green-700" : "text-red-700"}`}>{(delta>0?"+":"") + delta.toFixed(1)}%</td>
+                    <td className={`p-2 ${good ? "text-green-700" : "text-red-700"}`}>
+                      {(delta > 0 ? "+" : "") + delta.toFixed(1)}%
+                    </td>
                   </tr>
                 );
               })}
@@ -123,11 +139,11 @@ export default function BriefPage({ searchParams }: { searchParams: SearchParams
         </div>
       </section>
 
-      {bullets.map(([title, items]) => (
-        <section key={String(title)} className="mb-6 break-inside-avoid">
-          <h2 className="mb-2 text-lg font-semibold">{title}</h2>
+      {sections.map((sec) => (
+        <section key={sec.title} className="mb-6 break-inside-avoid">
+          <h2 className="mb-2 text-lg font-semibold">{sec.title}</h2>
           <ul className="list-disc space-y-1 pl-6 text-sm text-gray-800">
-            {(items as string[]).map((t, i) => <li key={i}>{t}</li>)}
+            {sec.items.map((t, i) => <li key={i}>{t}</li>)}
           </ul>
         </section>
       ))}
