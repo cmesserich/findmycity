@@ -1,5 +1,7 @@
 import { getCity, spendingPower, fmtMoney, percentDelta } from "@/lib/compare";
 import { normalizeSlug } from "@/lib/slug";
+import Checklist from "@/components/Checklist";
+
 
 export const dynamic = "force-dynamic";
 
@@ -137,6 +139,9 @@ export default function BriefPage({ searchParams }: { searchParams: SearchParams
             </tbody>
           </table>
         </div>
+      </section>
+      <section className="mt-8">
+        <Checklist keyId={`${a.slug}-${b.slug}`} />
       </section>
 
       {sections.map((sec) => (

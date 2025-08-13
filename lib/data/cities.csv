@@ -1,0 +1,16 @@
+slug,name,state,rpp,rentIndex,incomeMedian,diversityIndex,internetMbps,parksPer10k,cafesPer10k,barsPer10k,climate
+washington-dc,Washington,DC,118.7,85,92266,0.89,145,42,28,15,Humid subtropical
+omaha,Omaha,NE,89.2,45,58412,0.72,125,38,12,8,Continental
+austin,Austin,TX,102.3,70,81234,0.68,180,40,30,22,Humid subtropical
+denver,Denver,CO,103.1,68,70520,0.76,140,55,25,16,Semi-arid
+new-york-city,New York City,NY,122.0,100,82000,0.72,200,35,40,35,Humid subtropical
+miami,Miami,FL,107.5,77,60000,0.84,170,30,35,28,Tropical monsoon
+seattle,Seattle,WA,114.0,88,102000,0.71,220,60,28,20,Oceanic
+phoenix,Phoenix,AZ,98.2,53,62000,0.60,150,25,20,18,Hot desert
+boston,Boston,MA,117.5,90,93000,0.67,190,45,32,22,Humid continental
+san-diego,San Diego,CA,115.9,89,79673,0.84,165,34,26,20,Mediterranean
+chicago,Chicago,IL,107.0,70,72000,0.76,160,38,24,18,Humid continental
+tampa,Tampa,FL,100.2,60,64000,0.70,150,32,22,16,Humid subtropical
+portland,Portland,OR,105.0,75,78000,0.79,170,58,26,18,Oceanic
+nashville,Nashville,TN,98.5,58,65000,0.65,145,36,22,20,Humid subtropical
+atlanta,Atlanta,GA,101.0,63,69000,0.73,160,40,28,24,Humid subtropical

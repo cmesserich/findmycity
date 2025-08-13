@@ -3,6 +3,22 @@ import { CITIES } from "@/lib/data/cities";
 import { normalizeSlug } from "@/lib/slug";
 import DeltaPill from "@/components/DeltaPill";
 import CopyLinkButton from "@/components/CopyLinkButton";
+import { suggestCitySlugs } from "@/lib/fuzzy";
+import type { Metadata } from "next";
+
+export function generateMetadata({ searchParams }: { searchParams: Record<string, string> }): Metadata {
+  const a = (searchParams.a ?? "").replace(/-/g, " ");
+  const b = (searchParams.b ?? "").replace(/-/g, " ");
+  const salary = searchParams.salary ?? "your salary";
+  const title = a && b
+    ? `Compare ${a} vs ${b} – feels like on $${salary}`
+    : "Compare cities – Find My City";
+  const description = a && b
+    ? `See affordability, rent, internet, amenities and how $${salary} feels moving from ${a} to ${b}.`
+    : "Compare cities, check salary spending power, and explore lifestyle tradeoffs.";
+  return { title, description };
+}
+
 
 export const dynamic = "force-dynamic";
 
@@ -10,25 +26,63 @@ type SearchParams = { [key: string]: string | string[] | undefined };
 const clampSalary = (n: number) => (Number.isFinite(n) ? Math.max(0, Math.min(5_000_000, n)) : 100000);
 
 export default function ComparePage({ searchParams }: { searchParams: SearchParams }) {
-  const aSlug = normalizeSlug((searchParams.a as string) || "");
-  const bSlug = normalizeSlug((searchParams.b as string) || "");
+  const aParam = normalizeSlug((searchParams.a as string) || "");
+  const bParam = normalizeSlug((searchParams.b as string) || "");
   const salary = clampSalary(Number(searchParams.salary || 100000));
 
-  const a = aSlug ? getCity(aSlug) : undefined;
-  const b = bSlug ? getCity(bSlug) : undefined;
+  const a = aParam ? getCity(aParam) : undefined;
+  const b = bParam ? getCity(bParam) : undefined;
 
+  // Friendly invalid-slug screen with suggestions
   if (!a || !b) {
-    const known = CITIES.map((c) => c.slug).join(", ");
+    const salaryStr = String(salary || 100000);
+
+    const suggestList = (badSlug: string, forParam: "a" | "b", keepOther: string) => {
+      if (!badSlug) return null;
+      const suggestions = suggestCitySlugs(badSlug, 3);
+      if (suggestions.length === 0) return null;
+      return (
+        <ul className="mt-2 flex flex-wrap gap-2 text-sm">
+          {suggestions.map((s) => {
+            const href =
+              forParam === "a"
+                ? `/compare?a=${encodeURIComponent(s)}&b=${encodeURIComponent(keepOther)}&salary=${salaryStr}`
+                : `/compare?a=${encodeURIComponent(keepOther)}&b=${encodeURIComponent(s)}&salary=${salaryStr}`;
+          return (
+              <li key={`${forParam}-${s}`}>
+                <a className="btn-outline" href={href}>{s}</a>
+              </li>
+            );
+          })}
+        </ul>
+      );
+    };
+
     return (
       <main className="mx-auto max-w-3xl px-6 py-16 text-slate-900">
-        <h1 className="text-2xl font-semibold">Compare Cities</h1>
-        <p className="mt-4 text-slate-600">
-          Missing or invalid parameters. Try:
-          <br />
-          <code className="rounded bg-slate-100 px-2 py-1">/compare?a=washington-dc&b=omaha&salary=100000</code>
+        <h1 className="text-2xl font-semibold">We couldn’t find that city</h1>
+        {!a && (
+          <>
+            <p className="mt-3">
+              Unknown city A:{" "}
+              <code className="rounded bg-slate-100 px-1">{aParam || "(blank)"}</code>
+            </p>
+            {bParam && suggestList(aParam, "a", bParam)}
+          </>
+        )}
+        {!b && (
+          <>
+            <p className="mt-3">
+              Unknown city B:{" "}
+              <code className="rounded bg-slate-100 px-1">{bParam || "(blank)"}</code>
+            </p>
+            {aParam && suggestList(bParam, "b", aParam)}
+          </>
+        )}
+        <p className="mt-6 text-sm text-slate-600">
+          Try the <a className="underline" href="/wizard">matcher</a> or go back{" "}
+          <a className="underline" href="/">home</a>.
         </p>
-        <p className="mt-3 text-sm text-slate-500">Known slugs: {known}</p>
-        <a href="/" className="mt-6 inline-block text-blue-600 underline">← Home</a>
       </main>
     );
   }
@@ -65,28 +119,31 @@ export default function ComparePage({ searchParams }: { searchParams: SearchPara
           </p>
         </div>
         <div className="flex gap-2">
-          <a href={swapHref} className="rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50">
-            Swap cities
-          </a>
-          <CopyLinkButton className="border-slate-300 bg-white text-slate-700 shadow-sm" />
+          <a href={swapHref} className="btn-outline">Swap cities</a>
+          <CopyLinkButton />
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="card">
         <div className="grid gap-4 p-6 sm:grid-cols-3">
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="card-muted p-4">
             <div className="text-xs uppercase tracking-wide text-slate-500">Spending power</div>
             <div className="mt-2 text-2xl font-semibold">{fmtMoney(spend.destEquivalent)}</div>
             <div className="mt-1 text-sm text-slate-600">
               in {b.name}&nbsp;<DeltaPill value={spend.deltaPct} good={spend.deltaPct >= 0} />
             </div>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="card-muted p-4">
             <div className="text-xs uppercase tracking-wide text-slate-500">Housing snapshot</div>
-            <div className="mt-2 text-sm">Rent index: <span className="font-medium">{a.rentIndex}</span> → <span className="font-medium">{b.rentIndex}</span></div>
-            <div className="mt-1 text-sm">Income: <span className="font-medium">{fmtMoney(a.incomeMedian)}</span> → <span className="font-medium">{fmtMoney(b.incomeMedian)}</span></div>
+            <div className="mt-2 text-sm">
+              Rent index: <span className="font-medium">{a.rentIndex}</span> → <span className="font-medium">{b.rentIndex}</span>
+            </div>
+            <div className="mt-1 text-sm">
+              Income: <span className="font-medium">{fmtMoney(a.incomeMedian)}</span> →{" "}
+              <span className="font-medium">{fmtMoney(b.incomeMedian)}</span>
+            </div>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="card-muted p-4">
             <div className="text-xs uppercase tracking-wide text-slate-500">Lifestyle</div>
             <div className="mt-2 text-sm">Internet: <span className="font-medium">{b.internetMbps} Mbps</span></div>
             <div className="mt-1 text-sm">Parks per 10k: <span className="font-medium">{b.parksPer10k}</span></div>
@@ -95,13 +152,13 @@ export default function ComparePage({ searchParams }: { searchParams: SearchPara
         </div>
 
         <div className="overflow-x-auto border-t border-slate-200">
-          <table className="w-full border-collapse text-sm">
+          <table className="table">
             <thead>
-              <tr className="text-left text-slate-600">
-                <th className="border-b border-slate-200 p-3">Metric</th>
-                <th className="border-b border-slate-200 p-3">{a.name}</th>
-                <th className="border-b border-slate-200 p-3">{b.name}</th>
-                <th className="border-b border-slate-200 p-3">Δ (B vs A)</th>
+              <tr>
+                <th>Metric</th>
+                <th>{a.name}</th>
+                <th>{b.name}</th>
+                <th>Δ (B vs A)</th>
               </tr>
             </thead>
             <tbody>
@@ -110,26 +167,26 @@ export default function ComparePage({ searchParams }: { searchParams: SearchPara
                 const good = (r.better === "lower" && delta < 0) || (r.better === "higher" && delta > 0);
                 const format = (v: number) => (r.money ? fmtMoney(v) : v.toLocaleString());
                 return (
-                  <tr key={r.label} className="border-b border-slate-100 last:border-b-0">
-                    <td className="p-3 text-slate-800">{r.label}</td>
-                    <td className="p-3 text-slate-900">{format(r.a as number)}</td>
-                    <td className="p-3 text-slate-900">{format(r.b as number)}</td>
-                    <td className="p-3"><DeltaPill value={delta} good={good} /></td>
+                  <tr key={r.label}>
+                    <td className="text-slate-800">{r.label}</td>
+                    <td>{format(r.a as number)}</td>
+                    <td>{format(r.b as number)}</td>
+                    <td><DeltaPill value={delta} good={good} /></td>
                   </tr>
                 );
               })}
               <tr>
-                <td className="p-3">Climate</td>
-                <td className="p-3">{a.climate}</td>
-                <td className="p-3">{b.climate}</td>
-                <td className="p-3 text-slate-400">—</td>
+                <td>Climate</td>
+                <td>{a.climate}</td>
+                <td>{b.climate}</td>
+                <td className="text-slate-400">—</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <a href="/" className="mt-8 inline-block text-blue-600 underline">← New comparison</a>
+      <a href="/" className="mt-8 inline-block underline">← New comparison</a>
     </main>
   );
 }
