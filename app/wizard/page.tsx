@@ -15,9 +15,14 @@ function LabeledSlider({
         <label className="text-sm font-medium text-slate-700">{label}</label>
         <span className="text-xs text-slate-500">{value}</span>
       </div>
-      <input type="range" min={0} max={5} step={1} value={value}
+      <input
+        type="range"
+        min={0}
+        max={5}
+        step={1}
+        value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-2 w-full"
+        className="range mt-2 w-full"
       />
     </div>
   );
@@ -49,7 +54,7 @@ function ReasonChips({
   const top = contribs.slice(0, 3).map(c => c.label);
 
   return (
-    <div className="mt-2 flex flex-wrap gap-2 text-xs">
+    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
       <span className="text-slate-500">Why this matched:</span>
       {top.map(t => (
         <span key={t} className="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{t}</span>
@@ -58,12 +63,13 @@ function ReasonChips({
   );
 }
 
-export default function Page() {
+export default function WizardPage() {
   const [salary, setSalary] = React.useState(100000);
   const [current, setCurrent] = React.useState("washington-dc");
   const [weights, setWeights] = React.useState<Weights>({
     affordability: 4, internet: 3, parks: 2, cafes: 2, nightlife: 2, diversity: 3,
   });
+  const [activePreset, setActivePreset] = React.useState<string | null>(null);
 
   const [results, setResults] = React.useState<ReturnType<typeof getTopMatches> | null>(null);
 
@@ -75,27 +81,43 @@ export default function Page() {
 
   const currentCity = CITIES.find(c => c.slug === current);
 
-  function applyPreset(p: Weights) { setWeights(p); }
+  function applyPreset(label: string, p: Weights) {
+    setWeights(p);
+    setActivePreset(label);
+  }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <h1 className="text-3xl font-semibold">CityScout – Matcher</h1>
-      <p className="mt-2 text-slate-600">Tell us what matters, we’ll rank cities and let you jump into a comparison or brief.</p>
+    <main className="mx-auto max-w-5xl px-6 py-10">
+      {/* Header + requested subtext */}
+      <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900">
+        Find My City
+      </h1>
+      <p className="lead">
+        Tell us what matters to you! See if you match with one of our preselected profiles,
+        or change your preferences using the adjustable sliders. We will rank cities and let
+        you explore City Comparisons or City Reports.
+      </p>
 
-      {/* Presets */}
+      {/* Presets as chips */}
       <div className="mt-6 flex flex-wrap gap-2">
         {Object.entries(PRESETS).map(([label, p]) => (
-          <button key={label} type="button" className="btn-outline" onClick={() => applyPreset(p)}>
+          <button
+            key={label}
+            type="button"
+            className={`chip ${activePreset === label ? "chip-active" : ""}`}
+            onClick={() => applyPreset(label, p)}
+          >
             {label}
           </button>
         ))}
       </div>
 
       <form onSubmit={submit} className="mt-6 grid gap-6">
+        {/* Current city + salary */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <CityAutocomplete
             id="currentCity"
-            name="current"              // not submitted anywhere, but we keep the hidden field for consistency
+            name="current"
             label="Current city"
             defaultSlug={current}
             placeholder="e.g. Washington, DC"
@@ -114,17 +136,20 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <LabeledSlider label="Affordability" value={weights.affordability} onChange={(v) => setWeights({ ...weights, affordability: v })}/>
-          <LabeledSlider label="Internet speed" value={weights.internet} onChange={(v) => setWeights({ ...weights, internet: v })}/>
-          <LabeledSlider label="Parks / outdoors" value={weights.parks} onChange={(v) => setWeights({ ...weights, parks: v })}/>
-          <LabeledSlider label="Cafes" value={weights.cafes} onChange={(v) => setWeights({ ...weights, cafes: v })}/>
-          <LabeledSlider label="Nightlife" value={weights.nightlife} onChange={(v) => setWeights({ ...weights, nightlife: v })}/>
-          <LabeledSlider label="Diversity" value={weights.diversity} onChange={(v) => setWeights({ ...weights, diversity: v })}/>
+        {/* Sliders grouped in a muted section */}
+        <div className="section-muted">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <LabeledSlider label="Affordability"    value={weights.affordability} onChange={(v) => setWeights({ ...weights, affordability: v })}/>
+            <LabeledSlider label="Internet speed"   value={weights.internet}      onChange={(v) => setWeights({ ...weights, internet: v })}/>
+            <LabeledSlider label="Parks / outdoors" value={weights.parks}         onChange={(v) => setWeights({ ...weights, parks: v })}/>
+            <LabeledSlider label="Cafes"            value={weights.cafes}         onChange={(v) => setWeights({ ...weights, cafes: v })}/>
+            <LabeledSlider label="Nightlife"        value={weights.nightlife}     onChange={(v) => setWeights({ ...weights, nightlife: v })}/>
+            <LabeledSlider label="Diversity"        value={weights.diversity}     onChange={(v) => setWeights({ ...weights, diversity: v })}/>
+          </div>
         </div>
 
         <div>
-          <button className="btn w-full sm:w-auto">See top matches</button>
+          <button className="btn btn-primary w-full sm:w-auto">See top matches</button>
         </div>
       </form>
 
@@ -146,12 +171,13 @@ export default function Page() {
                         </span> vs {currentCity?.name}</> : null}
                       </div>
                       <div className="text-xs text-slate-500 mt-1">{city.climate}</div>
+                      <ReasonChips city={city} weights={weights} />
                     </div>
                     <div className="flex gap-2">
                       {currentCity && (
-                        <a className="btn-outline" href={`/compare?a=${currentCity.slug}&b=${city.slug}&salary=${salary}`}>Compare</a>
+                        <a className="btn-outline" href={`/compare?a=${currentCity.slug}&b=${city.slug}&salary=${salary}`}>Compare cities</a>
                       )}
-                      <a className="btn-outline" href={`/brief?a=${currentCity ? currentCity.slug : "washington-dc"}&b=${city.slug}&salary=${salary}`}>View brief</a>
+                      <a className="btn-outline" href={`/brief?a=${currentCity ? currentCity.slug : "washington-dc"}&b=${city.slug}&salary=${salary}`}>View report</a>
                     </div>
                   </div>
                 </li>

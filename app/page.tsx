@@ -1,3 +1,4 @@
+// app/page.tsx
 import Link from "next/link";
 import ShareCompareButton from "@/components/ShareCompareButton";
 import CityAutocomplete from "@/components/CityAutocomplete";
@@ -12,12 +13,16 @@ const PRESETS = [
 export default function HomePage() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="text-3xl font-semibold">Find My Next City</h1>
-      <p className="mt-2 text-slate-600">
-        Compare two US cities and see how your salary and lifestyle might change.
-      </p>
-      <p className="mt-2 text-sm">
-        Not sure where to go? Search for a city!<a className="underline" href="/wizard">Try the city matcher tool →</a>
+      {/* H1 changed */}
+      <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900">
+        Compare Cities
+      </h1>
+
+      <p className="lead">
+        Compare two US cities and see how your salary and lifestyle might change.{" "}
+        <a href="/wizard" className="text-[color:var(--brand)] hover:underline">
+          Try Find My City →
+        </a>
       </p>
 
       <form
@@ -52,11 +57,15 @@ export default function HomePage() {
             className="input mt-1"
           />
         </div>
-        <div className="sm:col-span-3">
-          <button className="btn w-full">Compare</button>
+
+        {/* primary Compare button aligned with inputs */}
+        <div className="flex items-end">
+          <button type="submit" className="btn btn-primary w-full sm:w-auto">Compare</button>
         </div>
+
+        {/* outline Share button below form on small screens */}
         <div className="sm:col-span-3 -mt-1">
-          <ShareCompareButton formId="compareForm" />
+          <ShareCompareButton formId="compareForm" className="btn-outline" />
         </div>
       </form>
 

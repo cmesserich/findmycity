@@ -32,7 +32,7 @@ export default function BriefsClient() {
     <main className="mx-auto max-w-5xl px-6 py-12 text-slate-900">
       <h1 className="text-3xl font-semibold">Relocation briefs</h1>
       <p className="mt-2 text-slate-600">
-        Pick a starting city and salary, then search for your destination to open a printable one-page brief.
+        Pick a starting city and salary, then search for your destination to open a printable one-page report.
       </p>
 
       {/* Controls */}

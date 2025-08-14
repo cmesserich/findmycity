@@ -1,23 +1,28 @@
+// app/layout.tsx
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+import { Inter } from "next/font/google";
 import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
 import { SITE } from "@/lib/site";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter", // reference in Tailwind as var(--font-inter)
 });
 
 export const metadata: Metadata = {
-  title: SITE.name,
-  description: SITE.tagline,
+  // helps OG/twitter absolute URLs
   metadataBase: new URL(SITE.url),
+
+  title: {
+    default: `${SITE.name} – Relocation made simple`,
+    template: `%s – ${SITE.name}`,
+  },
+  description: SITE.tagline,
+
   openGraph: {
     title: SITE.name,
     description: SITE.tagline,
@@ -25,6 +30,7 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     type: "website",
   },
+
   twitter: {
     card: "summary_large_image",
     title: SITE.name,
@@ -32,16 +38,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 min-h-screen`}
-      >
+      {/* Inter via next/font + Tailwind font-sans */}
+      <body className={`${inter.variable} font-sans`}>
         <NavBar />
-        {children}
+        <main className="section py-8 md:py-10">{children}</main>
+        <Footer />
       </body>
     </html>
   );

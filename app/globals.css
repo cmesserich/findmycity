@@ -1,65 +1,248 @@
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Brand tokens */
-  --brand: #3A5BAF;        /* primary */
-  --brand-600: #2f4a8f;    /* hover/dark */
+/* ---------- Tokens ---------- */
+@layer base {
+  :root {
+    /* Brand */
+    --brand: #1e3a8a;         /* Navy (primary) */
+    --brand-700: #1a2f78;     /* Hover */
+    --brand-rgb: 30 58 138;   /* For translucent shadows */
+
+    /* Surfaces */
+    --bg: #f8fafc;            /* Page background */
+    --surface: #ffffff;       /* Cards / inputs */
+    --surface-2: #f1f5f9;     /* Muted cards / table header */
+
+    /* Text & borders */
+    --text: #0f172a;          /* Slate-900 */
+    --muted: #475569;         /* Slate-600 */
+    --border: #e2e8f0;        /* Slate-200 */
+  }
+
+  html, body {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-[var(--bg)] text-[color:var(--text)] antialiased;
+  }
+
+  a { @apply text-[color:var(--brand)] underline-offset-2; }
+  a:hover { @apply underline; }
+
+  h1,h2,h3,h4 { @apply text-slate-900; }
 }
 
-/* Wordmark + icon colors */
-.logo-word {
-  color: var(--brand);
-}
-.logo-icon {
-  fill: var(--brand);
+/* ---------- Elements ---------- */
+@layer base {
+  /* Fintech-light inputs: white, soft border, brand focus halo via box-shadow */
+  input, select, textarea {
+    @apply w-full rounded-lg border border-[color:var(--border)]
+           bg-[color:var(--surface)] text-slate-900
+           px-3 py-2 shadow-sm placeholder:text-slate-400;
+    outline: none;
+    transition: box-shadow .15s ease, border-color .15s ease;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--brand);
+    /* 3px translucent brand ring without Tailwind @apply */
+    box-shadow: 0 0 0 3px rgba(var(--brand-rgb) / 0.25);
+  }
+
+  button { @apply focus:outline-none; }
 }
 
-/* Ensure pure black in print for maximum clarity and ink efficiency */
-@media print {
-  .logo-word { color: #000 !important; }
-  .logo-icon { fill: #000 !important; }
+/* ---------- Components ---------- */
+@layer components {
+  /* Base button */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg px-4 py-2 text-sm font-medium
+           transition-[background-color,box-shadow,color]
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply btn;
+    color: #fff;
+    background-color: var(--brand);
+  }
+  .btn-primary:hover {
+    background-color: var(--brand-700);
+  }
+  .btn-primary:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  /* Outline button */
+  .btn-outline {
+    @apply btn;
+    color: var(--brand);
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover {
+    background-color: var(--surface-2);
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply btn;
+    color: var(--brand);
+    background-color: transparent;
+  }
+  .btn-ghost:hover {
+    background-color: var(--surface-2);
+  }
+
+  /* Pills / deltas */
+  .pill { @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium; }
+  .pill-good { @apply bg-green-50 text-green-700 ring-1 ring-green-200; }
+  .pill-bad  { @apply bg-rose-50  text-rose-700  ring-1 ring-rose-200; }
+  .pill-neutral { @apply bg-slate-50 text-slate-600 ring-1 ring-slate-200; }
+
+  /* Cards */
+  .card {
+    @apply rounded-2xl shadow-sm border;
+    background-color: var(--surface);
+    border-color: var(--border);
+  }
+  .card-muted {
+    @apply rounded-xl border;
+    background-color: var(--surface-2);
+    border-color: var(--border);
+  }
+
+  /* Table */
+  .table { @apply w-full text-sm; }
+  .table thead th {
+    @apply text-left px-4 py-2 font-semibold;
+    background-color: var(--surface-2);
+    color: rgb(71 85 105);        /* slate-600 */
+    border-bottom: 1px solid var(--border);
+  }
+  .table tbody td {
+    @apply px-4 py-3;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Nav */
+  .nav-link { @apply text-slate-600 hover:text-slate-900; }
+  .logo { @apply flex items-center gap-2 text-slate-900 font-semibold; }
+
+  /* Page helpers */
+  .section { @apply mx-auto w-full max-w-5xl px-6; }
 }
 
-html, body {
-  @apply min-h-screen bg-slate-50 text-slate-900 antialiased;
+/* === CityScout UI add-ons (chips + sliders + utilities) === */
+@layer components {
+  /* Pills/chips for quick filters (e.g., “Granola & Trails”) */
+  .chip {
+    @apply inline-flex items-center rounded-full border px-3 py-1 text-sm
+           bg-white text-slate-700 border-slate-300 hover:bg-slate-50
+           transition-colors;
+  }
+  .chip-active {
+    background: color-mix(in srgb, var(--brand) 12%, white);
+    border-color: color-mix(in srgb, var(--brand) 35%, white);
+    color: var(--brand-ink);
+  }
+
+  /* a quiet section card wrapper (used around sliders) */
+  .section-muted {
+    @apply rounded-xl border border-slate-200 bg-slate-50/40 p-4 sm:p-6;
+  }
 }
 
-/* Typography */
-h1, h2 { @apply text-slate-900; }
-p      { @apply text-slate-600; }
+/* Brand sliders (uses modern `accent-color` and per-engine fallbacks) */
+/* Slider accent color (brand) */
+input[type="range"] { accent-color: var(--brand);
+  /* Chrome/Edge/Firefox modern */
+  height: 0.375rem;             /* Reserve vertical space so the thumb doesn't jump */
+}
+/* Range knob focus halo to match buttons */
+input[type="range"]::-webkit-slider-thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--brand-rgb) / 0.30);
+}
+input[type="range"]::-moz-range-thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--brand-rgb) / 0.30);
+}
 
-/* Links + focus */
-a { @apply text-blue-600 hover:text-blue-700; }
-:focus-visible { @apply outline-none ring-2 ring-blue-500/40 rounded-md; }
 
-/* Optional helpers */
-.input {
-  @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2
-         text-slate-900 placeholder-slate-400 shadow-sm
-         focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30;
+/* WebKit track + thumb */
+.range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: #e5e7eb; /* slate-200 */
 }
-.btn {
-  @apply inline-flex items-center justify-center rounded-md bg-slate-900
-         px-4 py-2 text-white shadow-sm hover:bg-slate-800
-         focus:outline-none focus:ring-2 focus:ring-blue-500/40;
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--brand);
+  margin-top: -4px; /* center thumb vertically on 6px track */
 }
-.btn-outline {
-  @apply inline-flex items-center justify-center rounded-md border border-slate-300
-         bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50;
-}
-.card        { @apply rounded-2xl border border-slate-200 bg-white shadow-sm; }
-.card-muted  { @apply rounded-xl  border border-slate-200 bg-slate-50; }
-.table       { @apply w-full border-collapse text-sm; }
-.table th    { @apply border-b border-slate-200 p-3 text-left text-slate-600; }
-.table td    { @apply border-b border-slate-100  p-3 text-slate-900; }
-.table tr:last-child td { @apply border-b-0; }
 
-/* --- Print polish --- */
-@media print {
-  header, footer, nav, .no-print, .btn, .btn-outline { display: none !important; }
-  main { padding: 0 !important; }
+/* Firefox track + thumb */
+.range::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: #e5e7eb;
 }
-.avoid-break { break-inside: avoid; }
-.page-break { break-before: page; }
+.range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--brand);
+}
+
+/* Small utility for hero spacing harmony */
+.lead {
+  @apply text-slate-600 mt-2;
+}
+
+/* ---------- Base Typography ---------- */
+@layer base {
+  html {
+    /* Slightly crisper text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    /* Inter everywhere via font-sans from Tailwind config */
+    @apply text-slate-900 text-base leading-relaxed;
+    background-color: var(--bg);
+  }
+
+  /* Headings hierarchy (Inter looks best a tad tighter) */
+  h1 { @apply text-4xl md:text-5xl font-semibold tracking-tight; }
+  h2 { @apply text-2xl md:text-3xl font-semibold tracking-tight; }
+  h3 { @apply text-xl font-semibold; }
+  h4 { @apply text-lg font-semibold; }
+  h5 { @apply text-base font-semibold; }
+  h6 { @apply text-sm font-semibold; }
+
+  /* Paragraph lead (subhead) */
+  .lead { @apply mt-2 text-base md:text-lg text-slate-600; }
+
+  /* Small helper text */
+  small, .muted { @apply text-sm text-slate-600; }
+}
+
+/* ---------- Numeric alignment for tables ---------- */
+/* Inter supports tabular numbers; make tables align digits neatly */
+.table {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}

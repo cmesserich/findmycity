@@ -1,22 +1,46 @@
+// components/ShareCompareButton.tsx
 'use client';
 
-export default function ShareCompareButton({ formId }: { formId: string }) {
+import * as React from 'react';
+
+type Props = {
+  formId: string;
+  className?: string; // e.g. "btn-outline", "btn-primary"
+  label?: string;     // button text override
+};
+
+export default function ShareCompareButton({
+  formId,
+  className = 'btn-outline',
+  label = 'Share comparison',
+}: Props) {
+  const handleClick = async () => {
+    const form = document.getElementById(formId) as HTMLFormElement | null;
+    if (!form) return;
+
+    const data = new FormData(form);
+    const a = (data.get('a') ?? '').toString().trim();
+    const b = (data.get('b') ?? '').toString().trim();
+    const salary = (data.get('salary') ?? '').toString().trim();
+
+    const url = new URL('/compare', window.location.origin);
+    if (a) url.searchParams.set('a', a);
+    if (b) url.searchParams.set('b', b);
+    if (salary) url.searchParams.set('salary', salary);
+
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      // Swap alert with your toast system if available
+      alert('Comparison link copied to clipboard.');
+    } catch {
+      // Fallback: show a copyable prompt
+      window.prompt('Copy this URL:', url.toString());
+    }
+  };
+
   return (
-    <button
-      type="button"
-      className="btn w-full sm:w-auto"
-      onClick={() => {
-        const form = document.getElementById(formId) as HTMLFormElement | null;
-        if (!form) return;
-        const a = (form.querySelector('input[name="a"]') as HTMLInputElement)?.value || "";
-        const b = (form.querySelector('input[name="b"]') as HTMLInputElement)?.value || "";
-        const salary = (form.querySelector('input[name="salary"]') as HTMLInputElement)?.value || "100000";
-        const url = `${window.location.origin}/compare?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}&salary=${encodeURIComponent(salary)}`;
-        navigator.clipboard?.writeText(url);
-        alert("Comparison link copied!");
-      }}
-    >
-      Share comparison
+    <button type="button" onClick={handleClick} className={`btn ${className}`}>
+      {label}
     </button>
   );
 }
