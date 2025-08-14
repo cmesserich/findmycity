@@ -1,6 +1,8 @@
 import { getCity, fmtMoney, spendingPower, percentDelta } from "@/lib/compare";
 import { normalizeSlug } from "@/lib/slug";
 import PrintButton from "@/components/PrintButton";
+import PrintBrandHeader from "@/components/PrintBrandHeader";
+
 // import CopyLinkButton if you want a share button here too
 // import CopyLinkButton from "@/components/CopyLinkButton";
 
@@ -24,6 +26,7 @@ export default async function BriefPage({
   if (!a || !b || !Number.isFinite(salary)) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-16">
+        <PrintBrandHeader/>
         <h1 className="text-2xl font-semibold">Missing or invalid parameters</h1>
         <p className="mt-3 text-slate-600">
           We need valid <code className="rounded bg-slate-100 px-1">a</code>,{" "}

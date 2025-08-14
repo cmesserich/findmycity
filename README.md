@@ -1,4 +1,4 @@
-# Find My City MVP
+# CityScout MVP
 
 A local-only web app to help remote workers compare U.S. cities and understand how their salary translates between locations.
 

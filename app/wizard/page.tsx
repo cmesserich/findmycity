@@ -79,7 +79,7 @@ export default function Page() {
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
-      <h1 className="text-3xl font-semibold">Find My City – Matcher</h1>
+      <h1 className="text-3xl font-semibold">CityScout – Matcher</h1>
       <p className="mt-2 text-slate-600">Tell us what matters, we’ll rank cities and let you jump into a comparison or brief.</p>
 
       {/* Presets */}

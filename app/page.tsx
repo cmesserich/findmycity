@@ -9,15 +9,15 @@ const PRESETS = [
   { a: "san-diego", b: "denver", label: "San Diego, CA → Denver, CO" },
 ];
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <main>
-      <h1 className="text-4xl font-semibold tracking-tight text-slate-900">Find My City</h1>
-      <p className="mt-3 text-lg text-slate-600">
+    <main className="mx-auto max-w-5xl px-6 py-10">
+      <h1 className="text-3xl font-semibold">Find My Next City</h1>
+      <p className="mt-2 text-slate-600">
         Compare two US cities and see how your salary and lifestyle might change.
       </p>
       <p className="mt-2 text-sm">
-        Not sure where to go? <a className="underline" href="/wizard">Try the matcher →</a>
+        Not sure where to go? Search for a city!<a className="underline" href="/wizard">Try the city matcher tool →</a>
       </p>
 
       <form

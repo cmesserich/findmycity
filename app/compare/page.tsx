@@ -5,24 +5,19 @@ import CopyLinkButton from "@/components/CopyLinkButton";
 import { suggestCitySlugs } from "@/lib/fuzzy";
 import type { Metadata } from "next";
 
-export function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Record<string, string>;
-}): Metadata {
+export function generateMetadata({ searchParams }: { searchParams: Record<string, string> }): Metadata {
   const a = (searchParams.a ?? "").replace(/-/g, " ");
   const b = (searchParams.b ?? "").replace(/-/g, " ");
   const salary = searchParams.salary ?? "your salary";
-  const title =
-    a && b
-      ? `Compare ${a} vs ${b} – feels like on $${salary}`
-      : "Compare cities – Find My City";
-  const description =
-    a && b
-      ? `See affordability, rent, internet, amenities and how $${salary} feels moving from ${a} to ${b}.`
-      : "Compare cities, check salary spending power, and explore lifestyle tradeoffs.";
+  const title = a && b
+    ? `Compare ${a} vs ${b} – feels like on $${salary} | CityScout`
+    : "Compare cities | CityScout";
+  const description = a && b
+    ? `See affordability, rent, internet, amenities and how $${salary} feels moving from ${a} to ${b}.`
+    : "Compare cities, check salary spending power, and explore lifestyle tradeoffs.";
   return { title, description };
 }
+
 
 export const dynamic = "force-dynamic";
 

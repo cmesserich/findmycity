@@ -2,8 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---- Light theme baseline ---- */
-:root { color-scheme: light; }
+:root {
+  /* Brand tokens */
+  --brand: #3A5BAF;        /* primary */
+  --brand-600: #2f4a8f;    /* hover/dark */
+}
+
+/* Wordmark + icon colors */
+.logo-word {
+  color: var(--brand);
+}
+.logo-icon {
+  fill: var(--brand);
+}
+
+/* Ensure pure black in print for maximum clarity and ink efficiency */
+@media print {
+  .logo-word { color: #000 !important; }
+  .logo-icon { fill: #000 !important; }
+}
 
 html, body {
   @apply min-h-screen bg-slate-50 text-slate-900 antialiased;

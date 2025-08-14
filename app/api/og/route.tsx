@@ -29,7 +29,7 @@ export async function GET(req: Request) {
           fontSize: 40,
         }}
       >
-        <div style={{ fontSize: 36, opacity: 0.8 }}>Find My City</div>
+        <div style={{ fontSize: 36, opacity: 0.8 }}>CityScout</div>
         <div style={{ fontSize: 64, fontWeight: 700, marginTop: 12 }}>
           {a.name}, {a.state} vs {b.name}, {b.state}
         </div>
