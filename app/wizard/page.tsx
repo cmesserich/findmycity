@@ -4,6 +4,7 @@ import * as React from "react";
 import { getTopMatches, type Preferences } from "@/lib/match";
 import { CITIES } from "@/lib/data/cities";
 import { spendingPower, fmtMoney } from "@/lib/compare";
+import CityAutocomplete from "@/components/CityAutocomplete";
 
 function LabeledSlider({
   label, value, onChange
@@ -36,7 +37,6 @@ const PRESETS: Record<string, Weights> = {
 function ReasonChips({
   city, weights
 }: { city: (typeof CITIES)[number]; weights: Weights }) {
-  // crude normalized contributions for explanation only
   const contribs: {label: string; value: number}[] = [
     { label: "Affordability", value: weights.affordability * (1 / Math.max(1, city.rpp)) + weights.affordability * (1 / Math.max(1, city.rentIndex)) * 0.3 },
     { label: "Internet",      value: weights.internet * city.internetMbps },
@@ -77,9 +77,6 @@ export default function Page() {
 
   function applyPreset(p: Weights) { setWeights(p); }
 
-  // lead capture + CSV from previous step still present? keep if you added it.
-  // (remove if you didn’t wire that; not required for this sprint item)
-
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
       <h1 className="text-3xl font-semibold">Find My City – Matcher</h1>
@@ -96,13 +93,24 @@ export default function Page() {
 
       <form onSubmit={submit} className="mt-6 grid gap-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Current city (slug, optional)</label>
-            <input list="city-slugs" value={current} onChange={e => setCurrent(e.target.value)} placeholder="e.g. seattle" className="input mt-1"/>
-          </div>
+          <CityAutocomplete
+            id="currentCity"
+            name="current"              // not submitted anywhere, but we keep the hidden field for consistency
+            label="Current city"
+            defaultSlug={current}
+            placeholder="e.g. Washington, DC"
+            onChangeSlug={(slug) => setCurrent(slug)}
+          />
           <div>
             <label className="block text-sm font-medium text-slate-700">Salary (USD)</label>
-            <input type="number" min={0} step={1000} value={salary} onChange={e => setSalary(Number(e.target.value))} className="input mt-1"/>
+            <input
+              type="number"
+              min={0}
+              step={1000}
+              value={salary}
+              onChange={(e) => setSalary(Number(e.target.value))}
+              className="input mt-1"
+            />
           </div>
         </div>
 
@@ -137,7 +145,7 @@ export default function Page() {
                           {fmtMoney(sp.destEquivalent)} ({(sp.deltaPct>0?"+":"") + sp.deltaPct.toFixed(1)}%)
                         </span> vs {currentCity?.name}</> : null}
                       </div>
-                      <ReasonChips city={city} weights={weights} />
+                      <div className="text-xs text-slate-500 mt-1">{city.climate}</div>
                     </div>
                     <div className="flex gap-2">
                       {currentCity && (
@@ -152,10 +160,6 @@ export default function Page() {
           </ol>
         </section>
       )}
-
-      <datalist id="city-slugs">
-        {CITIES.map(c => <option key={c.slug} value={c.slug} />)}
-      </datalist>
     </main>
   );
 }

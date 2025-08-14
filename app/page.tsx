@@ -1,11 +1,12 @@
 import Link from "next/link";
 import ShareCompareButton from "@/components/ShareCompareButton";
+import CityAutocomplete from "@/components/CityAutocomplete";
 
 const PRESETS = [
-  { a: "washington-dc", b: "omaha", label: "DC → Omaha" },
-  { a: "new-york-city", b: "miami", label: "NYC → Miami" },
-  { a: "seattle", b: "austin", label: "Seattle → Austin" },
-  { a: "san-diego", b: "denver", label: "San Diego → Denver" },
+  { a: "washington-dc", b: "omaha", label: "Washington, DC → Omaha, NE" },
+  { a: "new-york-city", b: "miami", label: "New York, NY → Miami, FL" },
+  { a: "seattle", b: "austin", label: "Seattle, WA → Austin, TX" },
+  { a: "san-diego", b: "denver", label: "San Diego, CA → Denver, CO" },
 ];
 
 export default function Home() {
@@ -19,41 +20,26 @@ export default function Home() {
         Not sure where to go? <a className="underline" href="/wizard">Try the matcher →</a>
       </p>
 
-      <datalist id="city-slugs">
-        {[
-          "washington-dc","omaha","austin","denver","new-york-city","miami","seattle","phoenix","boston",
-          "nashville","portland","atlanta","san-diego","chicago","tampa",
-        ].map((s) => (
-          <option key={s} value={s} />
-        ))}
-      </datalist>
-
       <form
         id="compareForm"
         className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3"
         action="/compare"
         aria-label="City comparison form"
       >
-        <div>
-          <label className="block text-sm font-medium text-slate-700">City A (slug)</label>
-          <input
-            name="a"
-            list="city-slugs"
-            defaultValue="washington-dc"
-            required
-            className="input mt-1"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-slate-700">City B (slug)</label>
-          <input
-            name="b"
-            list="city-slugs"
-            defaultValue="omaha"
-            required
-            className="input mt-1"
-          />
-        </div>
+        <CityAutocomplete
+          id="cityA"
+          name="a"
+          label="City A"
+          defaultSlug="washington-dc"
+          placeholder="e.g. Omaha, NE"
+        />
+        <CityAutocomplete
+          id="cityB"
+          name="b"
+          label="City B"
+          defaultSlug="omaha"
+          placeholder="e.g. New York, NY"
+        />
         <div>
           <label className="block text-sm font-medium text-slate-700">Salary (USD)</label>
           <input

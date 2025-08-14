@@ -1,44 +1,40 @@
-import { CITIES, City } from '@/lib/data/cities';
+// lib/compare.ts
+import { CITIES, type City } from "@/lib/data/cities";
 
+/** Get a city by slug (e.g., "washington-dc"). */
 export function getCity(slug: string): City | undefined {
-  return CITIES.find(city => city.slug.toLowerCase() === slug.toLowerCase());
+  return CITIES.find((c) => c.slug === slug);
 }
 
+/** Percentage change from A -> B (B vs A), signed. */
 export function percentDelta(a: number, b: number): number {
-  if (a === 0) return b === 0 ? 0 : 100;
+  if (a === 0 && b === 0) return 0;
+  if (a === 0) return 100;
   return ((b - a) / a) * 100;
 }
 
-export function spendingPower(salary: number, rppA: number, rppB: number): {
-  destEquivalent: number;
-  deltaPct: number;
-} {
-  // Calculate equivalent salary needed in destination city
-  const destEquivalent = (salary * rppB) / rppA;
-  
-  // Calculate the percentage difference in spending power
-  // Positive delta means you need less money (better spending power)
-  const deltaPct = ((salary - destEquivalent) / salary) * 100;
-  
-  return {
-    destEquivalent,
-    deltaPct
-  };
+/**
+ * Cost-of-living adjusted spending power when moving from A -> B.
+ * Lower RPP = cheaper. If B is cheaper than A, you should feel *richer* in B.
+ *
+ * destEquivalent = salary * (RPP_A / RPP_B)
+ * deltaPct       = (destEquivalent / salary - 1) * 100
+ */
+export function spendingPower(salary: number, rppA: number, rppB: number) {
+  const destEquivalent = salary * (rppA / rppB);     // <-- key fix: A / B (not B / A)
+  const deltaPct = percentDelta(salary, destEquivalent);
+  return { destEquivalent, deltaPct };
 }
 
-export function fmtMoney(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+export function fmtMoney(n: number) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
     maximumFractionDigits: 0,
-  }).format(amount);
+  });
 }
 
-export function fmtPct(percent: number): string {
-  const sign = percent >= 0 ? '+' : '';
-  return `${sign}${percent.toFixed(1)}%`;
-}
-
-export function normalizeSlug(input: string): string {
-  return input.toLowerCase().replace(/\s+/g, '-');
+export function fmtPct(p: number) {
+  const sign = p > 0 ? "+" : "";
+  return `${sign}${p.toFixed(1)}%`;
 }
