@@ -1,24 +1,20 @@
-export interface City {
-  slug: string;
-  name: string;
-  state: string;
-  pop: number;
-  rpp: number; // Regional Price Parity (lower = cheaper)
-  rentIndex: number; // 0-100 (higher = pricier)
-  incomeMedian: number; // USD
-  diversityIndex: number; // 0-1
-  internetMbps: number; // median speed
-  parksPer10k: number;
-  cafesPer10k: number;
-  barsPer10k: number;
-  climate: string;
-}
+import type { City } from "@/lib/types";
 
+// NOTE:
+// This file is the single source your app imports.
+// Our build script will OVERWRITE this file from data/inputs/cities_base.csv.
+// Until you run the script, these seed rows keep the app working.
+
+// ====== SEED DATA (you can delete once you generate from CSV) ======
 export const CITIES: City[] = [
   {
     slug: "washington-dc",
     name: "Washington",
     state: "DC",
+    state_fips: "11",
+    place_geoid: "1150000",
+    cbsa_code: "47900",
+    geo_level: "place",
     pop: 705749,
     rpp: 118.7,
     rentIndex: 85,
@@ -28,12 +24,17 @@ export const CITIES: City[] = [
     parksPer10k: 42,
     cafesPer10k: 28,
     barsPer10k: 15,
-    climate: "Humid subtropical"
+    climate: "Humid subtropical",
+    // commuteMedian, transitShare can be added later via CSV
   },
   {
     slug: "omaha",
     name: "Omaha",
     state: "NE",
+    state_fips: "31",
+    place_geoid: "3137000",
+    cbsa_code: "36540",
+    geo_level: "place",
     pop: 486051,
     rpp: 89.2,
     rentIndex: 45,
@@ -43,12 +44,16 @@ export const CITIES: City[] = [
     parksPer10k: 38,
     cafesPer10k: 12,
     barsPer10k: 8,
-    climate: "Continental"
+    climate: "Continental",
   },
   {
     slug: "austin",
     name: "Austin",
     state: "TX",
+    state_fips: "48",
+    place_geoid: "4805000",
+    cbsa_code: "12420",
+    geo_level: "place",
     pop: 978908,
     rpp: 102.4,
     rentIndex: 72,
@@ -58,8 +63,9 @@ export const CITIES: City[] = [
     parksPer10k: 35,
     cafesPer10k: 22,
     barsPer10k: 18,
-    climate: "Humid subtropical"
+    climate: "Humid subtropical",
   },
+  // ... keep the rest of your existing rows as-is ...
   {
     slug: "denver",
     name: "Denver",

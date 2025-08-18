@@ -24,6 +24,16 @@ export default function HomePage() {
           Try Find My City →
         </a>
       </p>
+      <p className="mt-2 text-sm text-slate-600">
+  Or{" "}
+  <a
+    className="text-[color:var(--brand)] hover:underline"
+    href="/snapshot?city=omaha&salary=100000"
+  >
+    view a single-city snapshot
+  </a>.
+</p>
+
 
       <form
         id="compareForm"
