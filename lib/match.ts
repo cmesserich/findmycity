@@ -1,15 +1,17 @@
-import { CITIES, City } from "@/lib/data/cities";
+// lib/match.ts
+import { CITIES } from "@/lib/data/cities";
+import type { City } from "@/lib/types"; 
 
 export type Preferences = {
   salary: number;
-  currentCitySlug?: string; // optional; improves "feels like" copy
+  currentCitySlug?: string;
   weights: {
-    affordability: number; // lower RPP & rent is better
-    internet: number;      // Mbps
-    parks: number;         // per 10k
-    cafes: number;         // per 10k
-    nightlife: number;     // bars per 10k
-    diversity: number;     // 0–1
+    affordability: number;
+    internet: number;
+    parks: number;
+    cafes: number;
+    nightlife: number;
+    diversity: number;
   };
 };
 

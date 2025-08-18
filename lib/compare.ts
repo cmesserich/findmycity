@@ -1,5 +1,7 @@
 // lib/compare.ts
-import { CITIES, type City } from "@/lib/data/cities";
+import { CITIES } from "@/lib/data/cities";
+import type { City } from "@/lib/types"; 
+
 
 /** Get a city by slug (e.g., "washington-dc"). */
 export function getCity(slug: string): City | undefined {

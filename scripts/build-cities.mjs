@@ -1,127 +1,100 @@
-import fs from "node:fs";
-import fsp from "node:fs/promises";
+// scripts/build-cities.mjs
 import path from "node:path";
+import fs from "node:fs/promises";
+import { existsSync, mkdirSync } from "node:fs";
 
-/**
- * Minimal CSV parser for controlled inputs (no quotes/commas inside fields).
- * Keep your CSV simple: no embedded commas; use hyphens for slugs.
- */
-function parseCSV(text) {
-  const lines = text.split(/\r?\n/).filter(Boolean);
-  const header = lines.shift().split(",").map(s => s.trim());
-  return lines.map(line => {
-    const cols = line.split(",").map(s => s.trim());
-    const row = {};
-    header.forEach((h, i) => { row[h] = cols[i] ?? ""; });
-    return row;
+const IN_CSV = path.join(process.cwd(), "data", "inputs", "cities_base.csv");
+const OUT_TS = path.join(process.cwd(), "lib", "data", "cities.ts");
+
+// Simple CSV parser for our flat file (no quoted commas expected)
+function parseCsv(text) {
+  const lines = text
+    .split(/\r?\n/)
+    .map(l => l.trim())
+    .filter(Boolean);
+
+  if (lines.length === 0) return [];
+
+  const header = lines[0].split(",").map(h => h.trim());
+  return lines.slice(1).map(line => {
+    const cols = line.split(",").map(c => c.trim());
+    const obj = {};
+    header.forEach((h, i) => (obj[h] = cols[i]));
+    return obj;
   });
 }
 
-function num(v) {
-  if (v === undefined || v === null || v === "") return null;
+function toNumber(v) {
+  if (v === undefined || v === null || v === "") return 0;
   const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
-
-function cleanStr(v) {
-  if (v === undefined || v === null) return null;
-  const s = String(v).trim();
-  return s.length ? s : null;
-}
-
-function toCity(row) {
-  // Map CSV row to City object (see lib/types.ts)
-  return {
-    slug: String(row.slug),
-    name: String(row.name),
-    state: String(row.state),
-
-    state_fips: cleanStr(row.state_fips),
-    place_geoid: cleanStr(row.place_geoid),
-    county_fips: cleanStr(row.county_fips),
-    cbsa_code: cleanStr(row.cbsa_code),
-    geo_level: cleanStr(row.geo_level),
-
-    pop: num(row.pop),
-
-    rpp: Number(row.rpp ?? 0),
-    rentIndex: Number(row.rentIndex ?? 0),
-    incomeMedian: Number(row.incomeMedian ?? 0),
-    diversityIndex: Number(row.diversityIndex ?? 0),
-    internetMbps: Number(row.internetMbps ?? 0),
-    parksPer10k: Number(row.parksPer10k ?? 0),
-    cafesPer10k: Number(row.cafesPer10k ?? 0),
-    barsPer10k: Number(row.barsPer10k ?? 0),
-    climate: String(row.climate ?? ""),
-
-    commuteMedian: num(row.commuteMedian),
-    transitShare: num(row.transitShare),
-  };
-}
-
-function cityToTs(c) {
-  // Stable key order for readability
-  const o = {
-    slug: c.slug, name: c.name, state: c.state,
-    state_fips: c.state_fips ?? null,
-    place_geoid: c.place_geoid ?? null,
-    county_fips: c.county_fips ?? null,
-    cbsa_code: c.cbsa_code ?? null,
-    geo_level: c.geo_level ?? null,
-    pop: c.pop ?? null,
-    rpp: c.rpp,
-    rentIndex: c.rentIndex,
-    incomeMedian: c.incomeMedian,
-    diversityIndex: c.diversityIndex,
-    internetMbps: c.internetMbps,
-    parksPer10k: c.parksPer10k,
-    cafesPer10k: c.cafesPer10k,
-    barsPer10k: c.barsPer10k,
-    climate: c.climate,
-    commuteMedian: c.commuteMedian ?? null,
-    transitShare: c.transitShare ?? null,
-  };
-  // Manual pretty-print (avoid extra deps)
-  const json = JSON.stringify(o, null, 2)
-    .replace(/"(\w+)":/g, "$1:")     // strip quotes on keys (valid TS object literal)
-    .replace(/: null/g, ": null");    // be explicit about nulls
-  return json;
+  return Number.isFinite(n) ? n : 0;
 }
 
 async function main() {
-  const root = process.cwd();
-  const inputPath = path.join(root, "data", "inputs", "cities_base.csv");
-  const outPath = path.join(root, "lib", "data", "cities.ts");
-  const typesImport = `import type { City } from "@/lib/types";\n`;
-
-  if (!fs.existsSync(inputPath)) {
-    console.error(`Missing ${inputPath}. Please create it (template below).`);
+  // 1) ensure input exists
+  if (!existsSync(IN_CSV)) {
+    console.error(`Missing ${IN_CSV}. Please create it with the template header below:\n`);
+    console.error(
+      [
+        "slug,name,state,pop,rpp,rentIndex,incomeMedian,diversityIndex,internetMbps,parksPer10k,cafesPer10k,barsPer10k,climate",
+        "washington-dc,Washington,DC,705749,118.7,85,92266,0.89,145,42,28,15,Humid subtropical",
+      ].join("\n")
+    );
     process.exit(1);
   }
 
-  const text = await fsp.readFile(inputPath, "utf8");
-  const rows = parseCSV(text);
-  if (!rows.length) {
-    console.error("No rows in cities_base.csv");
-    process.exit(1);
-  }
+  // 2) read and parse csv
+  const raw = await fs.readFile(IN_CSV, "utf8");
+  const rows = parseCsv(raw);
 
-  const cities = rows.map(toCity);
+  // 3) transform rows -> TS objects
+  const cities = rows.map(r => ({
+    slug: r.slug,
+    name: r.name,
+    state: r.state,
+    pop: toNumber(r.pop),
+    rpp: toNumber(r.rpp),
+    rentIndex: toNumber(r.rentIndex),
+    incomeMedian: toNumber(r.incomeMedian),
+    diversityIndex: toNumber(r.diversityIndex),
+    internetMbps: toNumber(r.internetMbps),
+    parksPer10k: toNumber(r.parksPer10k),
+    cafesPer10k: toNumber(r.cafesPer10k),
+    barsPer10k: toNumber(r.barsPer10k),
+    climate: r.climate ?? "",
+  }));
 
-  const header =
-`// AUTO-GENERATED by scripts/build-cities.mjs – do not hand-edit.
-// Source: data/inputs/cities_base.csv
-${typesImport}
-export const CITIES: City[] = [
+  // 4) ensure output dir exists
+  mkdirSync(path.dirname(OUT_TS), { recursive: true });
+
+  // 5) write TS module
+  const content = `// AUTO-GENERATED FILE. Do not edit by hand.
+// Source: ${path.relative(process.cwd(), IN_CSV)}
+
+export interface City {
+  slug: string;
+  name: string;
+  state: string;
+  pop: number;
+  rpp: number;
+  rentIndex: number;
+  incomeMedian: number;
+  diversityIndex: number;
+  internetMbps: number;
+  parksPer10k: number;
+  cafesPer10k: number;
+  barsPer10k: number;
+  climate: string;
+}
+
+export const CITIES: City[] = ${JSON.stringify(cities, null, 2)};
 `;
 
-  const body = cities.map(c => "  " + cityToTs(c)).join(",\n");
-  const footer = "\n];\n";
+  await fs.writeFile(OUT_TS, content, "utf8");
 
-  const fileText = header + body + footer;
-
-  await fsp.writeFile(outPath, fileText, "utf8");
-  console.log(`Wrote ${outPath} with ${cities.length} cities.`);
+  console.log(
+    `Wrote ${path.relative(process.cwd(), OUT_TS)} with ${cities.length} cities.`
+  );
 }
 
 main().catch(err => {

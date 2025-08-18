@@ -1,5 +1,6 @@
 import { CITIES } from "@/lib/data/cities";
 
+
 function levenshtein(a: string, b: string) {
   a = a.toLowerCase(); b = b.toLowerCase();
   const m = a.length, n = b.length;
