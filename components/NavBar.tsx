@@ -58,8 +58,9 @@ export default function NavBar() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm">
+          <NavLink href="/">Home</NavLink>
           <NavLink href="/snapshot">City Scouting Report</NavLink>
-          <NavLink href="/">Compare Cities</NavLink>
+          <NavLink href="/compare">Compare Cities</NavLink>
           <NavLink href="/wizard">Find Your City</NavLink>
           <NavLink href="/about" exact>About</NavLink>
           <NavLink href="/contact">Contact</NavLink>

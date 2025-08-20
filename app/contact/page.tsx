@@ -39,10 +39,11 @@ export default function ContactPage() {
         <div className="card p-6">
           <h2 className="text-lg font-semibold text-slate-900">Helpful links</h2>
           <ul className="mt-3 space-y-2 text-sm">
+            <li><Link className="nav-link underline" href="/">Home</Link></li>
             <li><Link className="nav-link underline" href="/about">About CityScout</Link></li>
             <li><Link className="nav-link underline" href="/wizard">Find Your City</Link></li>
             <li><Link className="nav-link underline" href="/snapshot">City Scouting Reports</Link></li>
-            <li><Link className="nav-link underline" href="/">Compare Cities</Link></li>
+            <li><Link className="nav-link underline" href="/compare">Compare Cities</Link></li>
           </ul>
         </div>
       </div>
