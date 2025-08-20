@@ -13,39 +13,60 @@ const PRESETS = [
 export default function HomePage() {
   return (
     <main>
-      {/* HERO — topo background + gradient */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[color:var(--brand-50)] to-white">
-        {/* subtle contour lines */}
-        <svg aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-10 text-[color:var(--brand)]">
-          <defs>
-            <pattern id="contours" width="180" height="180" patternUnits="userSpaceOnUse">
-              <path d="M0,90 C45,60 135,120 180,90" fill="none" stroke="currentColor" strokeWidth="0.6"/>
-              <path d="M0,30 C45,0 135,60 180,30" fill="none" stroke="currentColor" strokeWidth="0.6"/>
-              <path d="M0,150 C45,120 135,180 180,150" fill="none" stroke="currentColor" strokeWidth="0.6"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#contours)" />
-        </svg>
+      {/* HERO — visible topo lines + soft brand gradient */}
+<section className="relative overflow-hidden bg-gradient-to-br from-[color:var(--brand-50)] to-white">
+  {/* subtle radial glow behind content (no motion, a11y-friendly) */}
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full"
+    style={{
+      background:
+        "radial-gradient(closest-side, color-mix(in oklab, var(--brand) 22%, transparent) 0%, transparent 70%)",
+      filter: "blur(40px)",
+      opacity: 0.5,
+    }}
+  />
 
-        <div className="section py-16 md:py-20">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900">
-              Pick two cities. See your life side-by-side.
-            </h1>
-            <p className="mt-3 text-slate-600">
-              CityScout shows how your salary and lifestyle change when you move—then gives you clean, printable reports.
-            </p>
+  {/* topo overlay — higher contrast, scales with container */}
+  <svg
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0 h-full w-full"
+    viewBox="0 0 1200 600"
+    preserveAspectRatio="none"
+    style={{ color: "var(--brand)" }}
+  >
+    <g fill="none" stroke="currentColor" strokeWidth="2" opacity="0.12">
+      <path d="M0 60 C 300 20, 900 100, 1200 60" />
+      <path d="M0 140 C 300 100, 900 180, 1200 140" />
+      <path d="M0 220 C 300 180, 900 260, 1200 220" />
+      <path d="M0 300 C 300 260, 900 340, 1200 300" />
+      <path d="M0 380 C 300 340, 900 420, 1200 380" />
+      <path d="M0 460 C 300 420, 900 500, 1200 460" />
+      <path d="M0 540 C 300 500, 900 580, 1200 540" />
+    </g>
+  </svg>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              <Link href="/compare" className="btn btn-primary">Compare Cities</Link>
-              <Link href="/wizard" className="btn btn-outline">Find Your City</Link>
-              <Link href="/snapshot" className="btn btn-outline">City Scouting Report</Link>
-            </div>
+  <div className="section relative py-16 md:py-20">
+    <div className="max-w-3xl">
+      {/* Tagline — keep this the star */}
+      <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900">
+        Pick two cities. See your life side-by-side.
+      </h1>
+      <p className="mt-3 text-slate-600">
+        CityScout shows how your salary and lifestyle change when you move—then gives you clean, printable reports.
+      </p>
 
-            <p className="mt-2 text-xs text-slate-500">No account needed · Free to start</p>
-          </div>
-        </div>
-      </section>
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Link href="/compare" className="btn btn-primary">Compare Cities</Link>
+        <Link href="/wizard" className="btn btn-outline">Find Your City</Link>
+        <Link href="/snapshot" className="btn btn-outline">City Scouting Report</Link>
+      </div>
+
+      <p className="mt-2 text-xs text-slate-500">No account needed · Free to start</p>
+    </div>
+  </div>
+</section>
+
 
       {/* LIVE EXAMPLES */}
       <section className="section py-10">
