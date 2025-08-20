@@ -60,9 +60,8 @@ export default function NavBar() {
         <nav className="hidden md:flex items-center gap-6 text-sm">
           <NavLink href="/snapshot">City Scouting Report</NavLink>
           <NavLink href="/">Compare Cities</NavLink>
-          <NavLink href="/wizard">Find a City</NavLink>
+          <NavLink href="/wizard">Find Your City</NavLink>
           <NavLink href="/about" exact>About</NavLink>
-          <NavLink href="/about/data">Data</NavLink>
           <NavLink href="/contact">Contact</NavLink>
         </nav>
 
@@ -89,7 +88,7 @@ export default function NavBar() {
           <div className="section py-3 flex flex-col gap-3 text-sm">
             <NavLink href="/snapshot" onClick={close}>City Scouting Report</NavLink>
             <NavLink href="/" onClick={close}>Compare Cities</NavLink>
-            <NavLink href="/wizard" onClick={close}>Find a City</NavLink>
+            <NavLink href="/wizard" onClick={close}>Find Your City</NavLink>
             <NavLink href="/about" exact onClick={close}>About</NavLink>
             <NavLink href="/about/data" onClick={close}>Data</NavLink>
             <NavLink href="/contact" onClick={close}>Contact</NavLink>

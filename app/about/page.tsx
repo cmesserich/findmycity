@@ -1,110 +1,177 @@
 // app/about/page.tsx
 import type { Metadata } from "next";
-import Logo from "@/components/Logo";
-import { SITE } from "@/lib/site";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: `About — ${SITE.name}`,
-  description: `${SITE.name} helps remote workers quickly compare cities, understand how salary translates, and print shareable relocation briefs.`,
-  openGraph: {
-    title: `About — ${SITE.name}`,
-    description: `${SITE.name} makes relocation research fast, clear, and shareable.`,
-    url: `${SITE.url}/about`,
-    siteName: SITE.name,
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `About — ${SITE.name}`,
-    description: `${SITE.name} makes relocation research fast, clear, and shareable.`,
-  },
+  title: "About CityScout",
+  description:
+    "Who we are, what we believe, and how CityScout helps you choose where to live.",
+  openGraph: { title: "About CityScout" },
+  twitter: { title: "About CityScout", card: "summary" },
 };
 
 export default function AboutPage() {
-  // JSON-LD for richer search previews
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    name: `About — ${SITE.name}`,
-    url: `${SITE.url}/about`,
-    description:
-      `${SITE.name} helps remote workers compare cities, understand salary spending power, and print relocation briefs.`,
-    isPartOf: {
-      "@type": "WebSite",
-      name: SITE.name,
-      url: SITE.url,
-    },
-  };
-
   return (
-    <main className="mx-auto max-w-5xl px-6 py-10">
-      {/* Brand marker */}
-      <div className="mb-6">
-        <Logo />
-      </div>
-
-      <h1 className="text-3xl font-semibold">About {SITE.name}</h1>
-      <p className="mt-3 text-slate-700 leading-relaxed">
-        {SITE.name} makes relocation research fast, clear, and shareable. Compare cities side-by-side,
-        see how your salary translates, and print a polished brief you can send to friends, family, or employers.
+    <main className="mx-auto max-w-5xl px-6 py-12">
+      {/* Hero */}
+      <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900">
+        About CityScout
+      </h1>
+      <p className="mt-3 text-slate-600">
+        CityScout helps remote workers and movers make confident, modern
+        relocation decisions—fast. We turn messy data into clear comparisons and
+        one-page reports you can share with friends, family, or hiring teams.
       </p>
 
-      {/* Primary CTAs */}
-      <div className="mt-6 flex flex-wrap gap-3">
-        <a href="/" className="btn-primary">Compare cities</a>
-        <a href="/wizard" className="btn-outline">Try the matcher</a>
+      {/* Quick CTAs */}
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Link href="/wizard" className="btn btn-primary">Find Your City</Link>
+        <Link href="/compare" className="btn btn-outline">Compare Cities</Link>
+        <Link href="/contact" className="btn btn-outline">Contact</Link>
       </div>
 
-      {/* What we show */}
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold">What we show</h2>
-        <ul className="mt-3 list-disc pl-6 text-slate-700 space-y-1">
-          <li>Spending power (your salary adjusted by relative price levels)</li>
-          <li>Housing snapshot (rent index &amp; median household income)</li>
-          <li>Lifestyle signals (internet speed, parks, cafés, bars, climate)</li>
-        </ul>
+      {/* Story & Team */}
+      <section id="story" className="mt-12">
+        <h2 className="text-2xl font-semibold text-slate-900">Our story</h2>
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold">Why we built CityScout</h3>
+            <p className="mt-3 text-sm text-slate-700">
+              Moving is a high-stakes decision that’s usually made with a handful
+              of tabs, outdated “cost of living” calculators, and gut feel.
+              We wanted a tool that feels like a financial dashboard—clean,
+              objective, and fast—while still reflecting the lifestyle tradeoffs
+              that actually matter.
+            </p>
+            <p className="mt-3 text-sm text-slate-700">
+              CityScout started as a side project to compare where we lived to
+              where we might go next. Friends began asking for custom reports.
+              That’s when we realized there should be a simpler, more credible way
+              for everyone to scout cities.
+            </p>
+          </div>
+
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold">Who we are</h3>
+            <p className="mt-3 text-sm text-slate-700">
+              We’re a small remote team of product designers, data people, and
+              engineers who have lived in big cities, small towns, and everything
+              between. We’re obsessive about clarity, pragmatic about models, and
+              allergic to dark patterns.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm text-slate-700 list-disc pl-5">
+              <li><span className="font-medium">Product & Research:</span> turns user needs into simple flows.</li>
+              <li><span className="font-medium">Data & Engineering:</span> builds the scoring pipeline and fallbacks.</li>
+              <li><span className="font-medium">Design & Brand:</span> keeps the experience calm, modern, and printable.</li>
+            </ul>
+            <p className="mt-4 text-xs text-slate-500">
+              Interested in collaborating or partnering?{" "}
+              <Link href="/contact" className="underline">Say hello</Link>.
+            </p>
+          </div>
+
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold">What we value</h3>
+            <ul className="mt-3 space-y-3 text-sm text-slate-700">
+              <li>
+                <span className="font-medium">Clarity over noise:</span> one page, the right metrics, plain language.
+              </li>
+              <li>
+                <span className="font-medium">Honest tradeoffs:</span> we show when a place is cheaper but slower, or pricier but faster.
+              </li>
+              <li>
+                <span className="font-medium">Professional polish:</span> reports you’re proud to send to a recruiter or partner.
+              </li>
+              <li>
+                <span className="font-medium">Privacy by default:</span> we don’t sell personal data; we build for trust.
+              </li>
+            </ul>
+          </div>
+
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold">Who we serve</h3>
+            <ul className="mt-3 space-y-2 text-sm text-slate-700 list-disc pl-5">
+              <li>Remote workers exploring new cities.</li>
+              <li>People relocating for a job and needing a quick, credible brief.</li>
+              <li>Hiring & People teams who want better candidate relocation support.</li>
+            </ul>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link href="/wizard" className="btn btn-outline">Try the matcher</Link>
+              <Link href="/briefs" className="btn btn-outline">See City Reports</Link>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* How it works */}
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold">How it works</h2>
-        <ol className="mt-3 list-decimal pl-6 text-slate-700 space-y-2">
-          <li>Pick two cities and enter your salary.</li>
-          <li>We estimate “feels like” salary and highlight lifestyle differences.</li>
-          <li>Print or share a one-page brief to decide and get feedback fast.</li>
-        </ol>
-      </section>
-
-      {/* Data & methodology teaser + link */}
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold">
-          <a href="/about/data" className="hover:underline">Data &amp; methodology</a>
-        </h2>
-        <p className="mt-3 text-slate-700 leading-relaxed">
-          We combine publicly available datasets and normalized indices to provide directional insights.
-          Metrics are simplified for clarity and speed—perfect for early research.{" "}
-          <a href="/about/data" className="underline text-slate-900 hover:opacity-80">
-            Read the full methodology →
-          </a>
+      {/* Methodology (marketing-safe) */}
+      <section id="methodology" className="mt-12">
+        <h2 className="text-2xl font-semibold text-slate-900">How CityScout works</h2>
+        <p className="mt-2 text-slate-600">
+          A high-level overview of what we measure and how we turn it into
+          a score—transparent without exposing proprietary weighting.
         </p>
-      </section>
 
-      {/* Partnerships / contact */}
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold">Partnerships</h2>
-        <p className="mt-3 text-slate-700 leading-relaxed">
-          We’re exploring partnerships with moving companies, internet providers, and real-estate platforms
-          to help users go from decision to done. Interested in working with {SITE.name}?{" "}
-          <a className="underline" href="mailto:hello@cityscout.app">hello@cityscout.app</a>
-        </p>
-      </section>
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold">What we measure</h3>
+            <ul className="mt-3 space-y-2 text-sm text-slate-700 list-disc pl-5">
+              <li><strong>Affordability:</strong> overall price levels and housing pressure.</li>
+              <li><strong>Housing:</strong> rent index relative to peers.</li>
+              <li><strong>Connectivity:</strong> median internet speeds.</li>
+              <li><strong>Amenities:</strong> parks, cafés, and nightlife density.</li>
+              <li><strong>Diversity:</strong> mix of people and backgrounds.</li>
+              <li><strong>Mobility (coming soon):</strong> commute times & transit share.</li>
+            </ul>
+          </div>
 
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold">How we score</h3>
+            <p className="mt-3 text-sm text-slate-700">
+              We normalize each metric across places to a 0–1 range, apply
+              user-chosen weights, and combine them into a composite score out of
+              100. Some metrics invert (lower is better), others reward higher values.
+            </p>
+            <p className="mt-3 text-xs text-slate-500">
+              We don’t publish exact weights or the full feature list publicly.
+              Need more detail? <Link href="/contact" className="underline">Get in touch</Link>.
+            </p>
+          </div>
+
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold">Geography policy</h3>
+            <p className="mt-3 text-sm text-slate-700">
+              We use the lowest reliable geography available for each metric.
+              When a value is missing, we fall back in this order:
+              <em> Place → CBSA (metro/micro) → County → State</em>. This keeps
+              small towns searchable while maintaining coverage.
+            </p>
+          </div>
+
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold">Refresh & quality</h3>
+            <ul className="mt-3 space-y-2 text-sm text-slate-700 list-disc pl-5">
+              <li>Rolling source updates; consolidated quarterly releases.</li>
+              <li>Outlier checks and unit consistency validation.</li>
+              <li>We surface caveats when fallbacks are used.</li>
+            </ul>
+          </div>
+
+          <div className="card p-6 md:col-span-2">
+            <h3 className="text-lg font-semibold">Caveats</h3>
+            <ul className="mt-3 space-y-2 text-sm text-slate-700 list-disc pl-5">
+              <li>Prototype dataset; some values are illustrative or aggregated.</li>
+              <li>Affordability is directional and not a personal budget.</li>
+              <li>Coverage and metric depth will expand over time.</li>
+            </ul>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link href="/wizard" className="btn btn-outline">Try the matcher</Link>
+              <Link href="/compare" className="btn btn-outline">Compare cities</Link>
+              <Link href="/contact" className="btn btn-outline">Request a datasheet</Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

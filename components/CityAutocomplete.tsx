@@ -1,21 +1,24 @@
+// components/CityAutocomplete.tsx
 'use client';
 
-import * as React from "react";
-import { CITIES } from "@/lib/data/cities";
+import * as React from 'react';
+import { CITIES } from '@/lib/data/cities';
 
 type Props = {
-  /** Name for the hidden <input> that holds the slug (e.g. "a" or "b") */
+  /** Hidden field name that will submit the selected city's slug (e.g., "a" or "b") */
   name: string;
-  /** Optional visible label above the input */
+  /** Label above the input */
   label?: string;
-  /** Starting selection as a slug (e.g. "washington-dc") */
+  /** Starting selection as a slug (e.g., "washington-dc") */
   defaultSlug?: string;
-  /** Placeholder text for the visible text box */
+  /** Placeholder text for the visible input */
   placeholder?: string;
-  /** Notify parent when the selected slug changes (optional) */
+  /** Called whenever the selected slug changes */
   onChangeSlug?: (slug: string) => void;
-  /** Optional id to link label and input (accessibility) */
+  /** Optional id for label/input association */
   id?: string;
+  /** Maximum number of suggestions shown (default 50) */
+  maxResults?: number;
 };
 
 type CityItem = typeof CITIES[number];
@@ -26,157 +29,193 @@ function displayLabel(c: CityItem) {
 
 function findBySlug(slug?: string | null): CityItem | undefined {
   if (!slug) return undefined;
-  return CITIES.find(c => c.slug === slug);
+  return CITIES.find((c) => c.slug === slug);
 }
 
-function score(q: string, c: CityItem) {
-  const s = q.toLowerCase();
-  const label = `${c.name}, ${c.state}`.toLowerCase();
-  const slug = c.slug.toLowerCase();
-  if (!s) return 9999;
-  if (label.startsWith(s) || slug.startsWith(s)) return 0;      // best
-  if (label.includes(s) || slug.includes(s)) return 1;          // good
-  return 2;                                                     // meh
+function highlight(text: string, query: string) {
+  if (!query) return text;
+  const i = text.toLowerCase().indexOf(query.toLowerCase());
+  if (i < 0) return text;
+  const before = text.slice(0, i);
+  const match = text.slice(i, i + query.length);
+  const after = text.slice(i + query.length);
+  return (
+    <>
+      {before}
+      <mark className="rounded-[2px] bg-amber-100 px-0.5 text-amber-900">{match}</mark>
+      {after}
+    </>
+  );
 }
 
 export default function CityAutocomplete({
   name,
-  label = "City",
+  label = 'City',
   defaultSlug,
-  placeholder = "Start typing a city…",
+  placeholder = 'Start typing a city…',
   onChangeSlug,
   id,
+  maxResults = 50,
 }: Props) {
+  const inputId = id || `city-${name}`;
+
+  // initialize from default slug (if provided)
   const initial = findBySlug(defaultSlug);
-  const [query, setQuery] = React.useState(initial ? displayLabel(initial) : "");
-  const [slug, setSlug] = React.useState(initial?.slug ?? "");
-  const [open, setOpen] = React.useState(false);
-  const [active, setActive] = React.useState(0);
+  const [text, setText] = React.useState<string>(initial ? displayLabel(initial) : '');
+  const [slug, setSlug] = React.useState<string>(initial?.slug ?? '');
+  const [open, setOpen] = React.useState<boolean>(false);
+  const [activeIndex, setActiveIndex] = React.useState<number>(0);
+
   const listRef = React.useRef<HTMLUListElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
-  // Filter suggestions
+  // Compute filtered suggestions
   const suggestions = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    let arr = CITIES.slice();
-    if (q) {
-      arr = arr
-        .map(c => ({ c, s: score(q, c) }))
-        .sort((a, b) => a.s - b.s || a.c.name.localeCompare(b.c.name))
-        .slice(0, 8)
-        .map(x => x.c);
-    } else {
-      // Default: first 8 alphabetically for discoverability
-      arr = arr.sort((a, b) => a.name.localeCompare(b.name)).slice(0, 8);
-    }
-    return arr;
-  }, [query]);
+    const q = text.trim().toLowerCase();
 
+    const rank = (c: CityItem) => {
+      const label = `${c.name} ${c.state}`.toLowerCase();
+      const slug = c.slug.toLowerCase();
+      if (!q) return 2; // default rank when idle
+      if (label.startsWith(q) || slug.startsWith(q)) return 0;
+      if (label.includes(q) || slug.includes(q)) return 1;
+      return 3; // filtered out later
+    };
+
+    let list = CITIES.map((c) => ({ c, r: rank(c) }))
+      .filter((x) => x.r < 3) // keep startsWith/includes when typing
+      .sort(
+        (a, b) =>
+          a.r - b.r || // better rank first
+          (b.c.pop ?? 0) - (a.c.pop ?? 0) || // larger pop first
+          a.c.name.localeCompare(b.c.name)
+      )
+      .slice(0, maxResults)
+      .map((x) => x.c);
+
+    if (!q) {
+      // When idle (no query), show top by population for discoverability
+      list = CITIES.slice()
+        .sort((a, b) => (b.pop ?? 0) - (a.pop ?? 0))
+        .slice(0, maxResults);
+    }
+    return list;
+  }, [text, maxResults]);
+
+  // Choose a city explicitly
   function choose(city: CityItem) {
-    setQuery(displayLabel(city));
-    setSlug(city.slug);
+    setText(displayLabel(city));
+    if (slug !== city.slug) {
+      setSlug(city.slug);
+      onChangeSlug?.(city.slug);
+    }
     setOpen(false);
-    setActive(0);
-    onChangeSlug?.(city.slug);
-    // return focus for quick tabbing
+    setActiveIndex(0);
+    // return focus to input for fast tabbing
     inputRef.current?.focus();
   }
 
+  // Blur behavior: keep the last explicit choice unless text exactly equals a label.
   function onBlur() {
-    // If the visible text exactly matches a city label, keep it;
-    // else if there are suggestions, pick the first one; otherwise clear.
-    const exact = CITIES.find(c => displayLabel(c).toLowerCase() === query.trim().toLowerCase());
-    if (exact) {
-      if (exact.slug !== slug) {
-        setSlug(exact.slug);
-        onChangeSlug?.(exact.slug);
-      }
-      return;
+    const exact = CITIES.find(
+      (c) => displayLabel(c).toLowerCase() === text.trim().toLowerCase()
+    );
+    if (exact && exact.slug !== slug) {
+      setSlug(exact.slug);
+      onChangeSlug?.(exact.slug);
     }
-    if (suggestions.length) {
-      choose(suggestions[0]);
-      return;
-    }
-    // no match; clear
-    setSlug("");
-    onChangeSlug?.("");
+    setOpen(false);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!open && (e.key === "ArrowDown" || e.key === "Enter")) {
+    if (!open && (e.key === 'ArrowDown' || e.key === 'Enter')) {
       setOpen(true);
       return;
     }
     if (!open) return;
-    if (e.key === "ArrowDown") {
+
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setActive((i) => Math.min(i + 1, suggestions.length - 1));
-    } else if (e.key === "ArrowUp") {
+      setActiveIndex((i) => Math.min(i + 1, Math.max(0, suggestions.length - 1)));
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setActive((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter") {
+      setActiveIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (suggestions[active]) choose(suggestions[active]);
-    } else if (e.key === "Escape") {
+      if (suggestions[activeIndex]) choose(suggestions[activeIndex]);
+    } else if (e.key === 'Escape') {
       setOpen(false);
     }
   }
 
-  // close list if clicking outside
-  React.useEffect(() => {
-    function onDocClick(e: MouseEvent) {
-      if (!listRef.current || !inputRef.current) return;
-      if (
-        e.target instanceof Node &&
-        !listRef.current.contains(e.target) &&
-        !inputRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
+  const listboxId = `${inputId}-listbox`;
+  const activeId =
+    open && suggestions[activeIndex] ? `${inputId}-opt-${activeIndex}` : undefined;
 
   return (
     <div className="relative">
-      <label htmlFor={id} className="block text-sm font-medium text-slate-700">{label}</label>
-      {/* Visible text input (for humans) */}
+      <label htmlFor={inputId} className="block text-sm font-medium text-slate-700">
+        {label}
+      </label>
+
+      {/* Visible input for humans */}
       <input
         ref={inputRef}
-        id={id}
+        id={inputId}
         type="text"
-        value={query}
-        placeholder={placeholder}
         className="input mt-1"
-        autoComplete="off"
-        onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+        placeholder={placeholder}
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+          setOpen(true);
+        }}
         onFocus={() => setOpen(true)}
         onKeyDown={onKeyDown}
         onBlur={onBlur}
+        autoComplete="off"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded={open}
+        aria-controls={listboxId}
+        aria-activedescendant={activeId}
       />
-      {/* Hidden field that the form will submit (for app) */}
+
+      {/* Hidden field for the form to submit */}
       <input type="hidden" name={name} value={slug} />
 
       {open && suggestions.length > 0 && (
         <ul
+          id={listboxId}
           ref={listRef}
           role="listbox"
-          className="absolute z-10 mt-1 w-full overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg"
+          className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-md border border-[color:var(--border)] bg-white shadow-lg"
         >
           {suggestions.map((c, idx) => {
-            const isActive = idx === active;
+            const isActive = idx === activeIndex;
+            const labelText = displayLabel(c);
             return (
               <li
+                id={`${inputId}-opt-${idx}`}
                 key={c.slug}
                 role="option"
                 aria-selected={isActive}
-                className={`cursor-pointer px-3 py-2 text-sm ${isActive ? "bg-slate-100" : "bg-white hover:bg-slate-50"}`}
-                onMouseDown={(e) => { e.preventDefault(); choose(c); }}
-                onMouseEnter={() => setActive(idx)}
+                className={`cursor-pointer px-3 py-2 text-sm ${
+                  isActive ? 'bg-slate-100' : 'bg-white hover:bg-slate-50'
+                }`}
+                // Use onMouseDown so we select before the input blurs
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  choose(c);
+                }}
+                onMouseEnter={() => setActiveIndex(idx)}
               >
-                <div className="font-medium text-slate-900">{c.name}, {c.state}</div>
-                <div className="text-xs text-slate-500">{c.climate}</div>
+                <div className="font-medium text-slate-900">
+                  {highlight(labelText, text)}
+                </div>
+                {c.climate ? (
+                  <div className="text-xs text-slate-500">{c.climate}</div>
+                ) : null}
               </li>
             );
           })}

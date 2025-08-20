@@ -1,0 +1,32 @@
+slug,name,state,state_fips,place_geoid,county_fips,cbsa_code,geo_level
+washington-dc,Washington,DC,11,1150000,11001,47900,place
+omaha,Omaha,NE,31,3137000,31055,36540,place
+austin,Austin,TX,48,4805000,48453,12420,place
+denver,Denver,CO,08,0802000,08031,19740,place
+new-york-city,New York City,NY,36,3651000,36061,35620,place
+miami,Miami,FL,12,1245000,12086,33100,place
+seattle,Seattle,WA,53,5363000,53033,42660,place
+phoenix,Phoenix,AZ,04,0455000,04013,38060,place
+boston,Boston,MA,25,2507000,25025,14460,place
+nashville,Nashville,TN,47,4752000,47037,34980,place
+portland,Portland,OR,41,4159000,41051,38900,place
+atlanta,Atlanta,GA,13,1304000,13121,12060,place
+san-diego,San Diego,CA,06,0666000,06073,41740,place
+chicago,Chicago,IL,17,1714000,17031,16980,place
+tampa,Tampa,FL,12,1271000,12057,45300,place
+los-angeles,Los Angeles,CA,06,0644000,06037,31180,place
+san-francisco,San Francisco,CA,06,0667000,06075,41860,place
+san-jose,San Jose,CA,06,0668000,06085,41940,place
+dallas,Dallas,TX,48,4819000,48113,19100,place
+houston,Houston,TX,48,4835000,48201,26420,place
+san-antonio,San Antonio,TX,48,4865000,48029,41700,place
+minneapolis,Minneapolis,MN,27,2743000,27053,33460,place
+charlotte,Charlotte,NC,37,3712000,37119,16740,place
+raleigh,Raleigh,NC,37,3755000,37183,39580,place
+salt-lake-city,Salt Lake City,UT,49,4967000,49035,41620,place
+philadelphia,Philadelphia,PA,42,4260000,42101,37980,place
+columbus,Columbus,OH,39,3918000,39049,18140,place
+kansas-city,Kansas City,MO,29,2938000,29095,28140,place
+las-vegas,Las Vegas,NV,32,3246000,32003,29820,place
+detroit,Detroit,MI,26,2622000,26163,19820,place
+indianapolis,Indianapolis,IN,18,1836000,18097,26900,place

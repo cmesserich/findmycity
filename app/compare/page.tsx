@@ -3,8 +3,11 @@ import type { Metadata } from "next";
 import { getCity, percentDelta, spendingPower, fmtMoney } from "@/lib/compare";
 import { normalizeSlug } from "@/lib/slug";
 import DeltaPill from "@/components/DeltaPill";
-import CopyLinkButton from "@/components/CopyLinkButton";
 import { suggestCitySlugs } from "@/lib/fuzzy";
+import PrintButton from "@/components/PrintButton";
+import CopyLinkButton from "@/components/CopyLinkButton";
+import Link from "next/link";
+
 
 export const dynamic = "force-dynamic";
 
@@ -60,19 +63,19 @@ export default async function ComparePage(
       const suggestions = suggestCitySlugs(badSlug, 3);
       if (suggestions.length === 0) return null;
       return (
-        <ul className="mt-2 flex flex-wrap gap-2 text-sm">
-          {suggestions.map((s) => {
-            const href =
-              forParam === "a"
-                ? `/compare?a=${encodeURIComponent(s)}&b=${encodeURIComponent(keepOther)}&salary=${salaryStr}`
-                : `/compare?a=${encodeURIComponent(keepOther)}&b=${encodeURIComponent(s)}&salary=${salaryStr}`;
-            return (
-              <li key={`${forParam}-${s}`}>
-                <a className="btn-outline" href={href}>{s}</a>
-              </li>
-            );
-          })}
-        </ul>
+  <ul className="mt-2 flex flex-wrap gap-2 text-sm">
+    {suggestions.map((s) => {
+      const href =
+        forParam === "a"
+          ? `/compare?a=${encodeURIComponent(s)}&b=${encodeURIComponent(keepOther)}&salary=${salaryStr}`
+          : `/compare?a=${encodeURIComponent(keepOther)}&b=${encodeURIComponent(s)}&salary=${salaryStr}`;
+      return (
+        <li key={`${forParam}-${s}`}>
+          <Link className="btn-outline" href={href}>{s}</Link>
+        </li>
+      );
+    })}
+  </ul>
       );
     };
 
@@ -98,9 +101,9 @@ export default async function ComparePage(
           </>
         )}
         <p className="mt-6 text-sm text-slate-600">
-          Try the <a className="underline" href="/wizard">Find My City</a> tool or go back{" "}
-          <a className="underline" href="/">home</a>.
-        </p>
+  Try the <Link className="underline" href="/wizard">Find My City</Link> tool or go back{" "}
+  <Link className="underline" href="/">home</Link>.
+</p>
       </main>
     );
   }
@@ -119,8 +122,6 @@ export default async function ComparePage(
     { label: "Bars per 10k", a: a.barsPer10k, b: b.barsPer10k, better: "higher" as const },
   ];
 
-  const swapHref = `/compare?a=${b.slug}&b=${a.slug}&salary=${salary}`;
-
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -138,9 +139,14 @@ export default async function ComparePage(
           </p>
         </div>
         <div className="flex gap-2">
-          <a href={swapHref} className="btn-outline">Swap cities</a>
-          <CopyLinkButton />
-        </div>
+  <Link href={`/compare?a=${b.slug}&b=${a.slug}&salary=${salary}`} className="btn btn-outline">
+    Swap cities
+  </Link>
+  <CopyLinkButton className="btn btn-outline" />
+ <PrintButton className="btn btn-outline" label="Export report" />
+
+
+</div>
       </div>
 
       <div className="card">
@@ -207,14 +213,19 @@ export default async function ComparePage(
 
       {/* Quick links to pair briefs (A->B and B->A) */}
       <section className="mt-8">
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <a className="btn-outline" href={`/brief?a=${a.slug}&b=${b.slug}&salary=${salary}`}>
-            View City Report: {a.name} → {b.name}
-          </a>
-          <a className="btn-outline" href={`/brief?a=${b.slug}&b=${a.slug}&salary=${salary}`}>
-            View City Report: {b.name} → {a.name}
-          </a>
-        </div>
+        <div className="mt-8 card p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <div className="text-sm text-slate-600">Want the full City Report with more detail?</div>
+  <div className="flex flex-wrap gap-2">
+    <Link className="btn btn-outline" href={`/brief?a=${a.slug}&b=${b.slug}&salary=${salary}`}>
+      View City Report (to {b.name})
+    </Link>
+    <Link className="btn btn-outline" href={`/brief?a=${b.slug}&b=${a.slug}&salary=${salary}`}>
+      View City Report (to {a.name})
+    </Link>
+  </div>
+</div>
+
+
       </section>
 
       <a href="/" className="mt-8 inline-block underline">← New comparison</a>

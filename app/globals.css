@@ -57,38 +57,59 @@
 
 /* ---------- Components ---------- */
 @layer components {
-  /* Base button */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2
-           rounded-lg px-4 py-2 text-sm font-medium
-           transition-[background-color,box-shadow,color]
-           disabled:opacity-50 disabled:cursor-not-allowed;
-  }
+/* --- Buttons: consistent base across variants --- */
+.btn,
+.btn-outline,
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;              /* matches input height */
+  padding: 0 0.9rem;
+  border-radius: 0.5rem;
+  line-height: 1;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text-strong);
+  white-space: nowrap;       /* never wrap “Swap cities”, etc. */
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
 
-  /* Primary button */
-  .btn-primary {
-    @apply btn;
-    color: #fff;
-    background-color: var(--brand);
-  }
-  .btn-primary:hover {
-    background-color: var(--brand-700);
-  }
-  .btn-primary:focus-visible {
-    outline: 2px solid var(--brand);
-    outline-offset: 2px;
-  }
+.btn-primary {
+  background: #1f3b8c;
+  border-color: #1f3b8c;
+  color: #fff;
+}
 
-  /* Outline button */
-  .btn-outline {
-    @apply btn;
-    color: var(--brand);
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-  }
-  .btn-outline:hover {
-    background-color: var(--surface-2);
-  }
+.btn-outline {
+  background: #fff;
+  color: #0f172a;
+}
+
+.btn:disabled,
+.btn-outline:disabled,
+.btn-primary:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* optional hover focus polish */
+.btn:hover,
+.btn-outline:hover {
+  background: #f8fafc;
+}
+.btn-primary:hover {
+  background: #193171;
+  border-color: #193171;
+}
+.btn:focus-visible,
+.btn-outline:focus-visible,
+.btn-primary:focus-visible {
+  outline: 3px solid rgba(31,59,140,.25);
+  outline-offset: 2px;
+}
+
 
   /* Ghost button */
   .btn-ghost {
@@ -245,4 +266,36 @@ input[type="range"]::-moz-range-thumb:focus-visible {
 .table {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
+}
+
+/* ---------- Print helpers ---------- */
+@media print {
+  .no-print { display: none !important; }
+  .only-print { display: block !important; }
+}
+
+/* Optional: underline active nav links via aria-current without touching markup */
+.nav-link[aria-current="page"] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---- Print helpers ---- */
+.print-only { display: none; }
+@media print {
+  /* Hide non-essential chrome */
+  header, footer, .no-print, .btn, .nav-link { display: none !important; }
+
+  /* Expand the content when printing to PDF */
+  .print-container { max-width: none !important; padding: 0 !important; }
+
+  /* Keep subtle structure without box-shadows */
+  .card, .card-muted { border: 1px solid #e5e7eb !important; box-shadow: none !important; }
+
+  /* Table header shading in print */
+  .table thead th {
+    background: #f8fafc !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
