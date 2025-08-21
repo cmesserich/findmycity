@@ -64,6 +64,7 @@ export default function NavBar() {
           <NavLink href="/compare">Compare Cities</NavLink>
           <NavLink href="/about" exact>About</NavLink>
           <NavLink href="/contact">Contact</NavLink>
+          <NavLink href="/feedback">Feedback</NavLink>
         </nav>
 
         {/* Mobile toggle */}

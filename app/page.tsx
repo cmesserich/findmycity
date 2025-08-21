@@ -1,5 +1,7 @@
 // app/page.tsx
 import Link from "next/link";
+import { CONTACT_EMAIL } from "@/lib/constants";
+
 
 export const dynamic = "force-dynamic";
 
@@ -144,16 +146,16 @@ export default function HomePage() {
             </ul>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
-                href="/contact?subject=CityScout%20Pro%20waitlist"
+                href={`mailto:${CONTACT_EMAIL}?subject=CityScout%20feedback%20-%20join%20the%20pro%20waitlist`}
                 className="btn btn-outline"
               >
                 Join Pro waitlist
               </Link>
               <Link
-                href="/contact?subject=Pro%20pricing%20question"
+                href={`mailto:${CONTACT_EMAIL}?subject=CityScout%20feedback%20-%20%20pricing`}
                 className="btn btn-outline"
               >
-                Ask about pricing
+                Ask About Pricing
               </Link>
             </div>
           </div>
@@ -168,13 +170,13 @@ export default function HomePage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
-              href="/contact?subject=Join%20the%20CityScout%20waitlist"
+              href={`mailto:${CONTACT_EMAIL}?subject=CityScout%20feedback%20-%20%20join%20the%20waitlist`}
               className="btn btn-outline"
             >
               Join the waitlist
             </Link>
             <Link
-              href="/contact?subject=Partnerships%20and%20integrations"
+              href={`mailto:${CONTACT_EMAIL}?subject=CityScout%20feedback%20-%20partner%20with%20us`}
               className="btn btn-outline"
             >
               Partner with us

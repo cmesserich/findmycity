@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ContactMailtoForm from "@/components/ContactMailtoForm";
+import { CONTACT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Contact — CityScout",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-  const email = "hello@cityscout.app"; // TODO: replace with your real address
+  const email = "contactcityscout@gmail.com"; // TODO: replace with your real address
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
@@ -28,10 +29,10 @@ export default function ContactPage() {
             The fastest way to reach us. We typically reply within 1–2 business days.
           </p>
           <a
-            href={`mailto:${email}?subject=CityScout%20Inquiry`}
+            href={`mailto:${CONTACT_EMAIL}?subject=CityScout%20feedback%20-%20%20contact`}
             className="mt-4 inline-flex btn btn-primary"
           >
-            Email {email}
+            {CONTACT_EMAIL}
           </a>
         </div>
 
@@ -44,6 +45,7 @@ export default function ContactPage() {
             <li><Link className="nav-link underline" href="/wizard">Find Your City</Link></li>
             <li><Link className="nav-link underline" href="/snapshot">City Scouting Reports</Link></li>
             <li><Link className="nav-link underline" href="/compare">Compare Cities</Link></li>
+            <li><Link className="nav-link underline" href="/feedback">Feedback</Link></li>
           </ul>
         </div>
       </div>
@@ -54,7 +56,7 @@ export default function ContactPage() {
         <p className="mt-2 text-sm text-slate-600">
           This opens your email app with the details pre-filled.
         </p>
-        <ContactMailtoForm email={email} />
+        <ContactMailtoForm email={CONTACT_EMAIL} />
       </div>
     </main>
   );
