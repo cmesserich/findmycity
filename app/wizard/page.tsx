@@ -125,7 +125,7 @@ export default function WizardPage() {
 
       {/* helper nav buttons */}
       <div className="mt-4 flex flex-wrap gap-2">
-        <Link href="/" className="btn btn-outline">Compare Cities</Link>
+        <Link href="/compare" className="btn btn-outline">Compare Cities</Link>
         <Link href="/snapshot" className="btn btn-outline">City Scouting Report</Link>
       </div>
 

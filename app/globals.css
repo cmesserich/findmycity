@@ -22,12 +22,21 @@
     --border: #e2e8f0;        /* Slate-200 */
   }
 
+  /* ADD THIS CSS RESET */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
   html, body {
     @apply h-full;
+    margin: 0;
+    padding: 0;
   }
 
   body {
-    @apply bg-[var(--bg)] text-[color:var(--text)] antialiased;
+    @apply bg-[var(--bg)] text-[var(--text)] antialiased;
   }
 
   a { @apply text-[color:var(--brand)] underline-offset-2; }
@@ -103,12 +112,17 @@
   background: #193171;
   border-color: #193171;
 }
-.btn:focus-visible,
-.btn-outline:focus-visible,
-.btn-primary:focus-visible {
-  outline: 3px solid rgba(31,59,140,.25);
-  outline-offset: 2px;
+/* Focus rings (match current effective look) */
+.btn:focus-visible {
+outline: 2px solid color-mix(in oklab, var(--brand) 70%, #000 0%);
+outline-offset: 3px;
 }
+btn-outline:focus-visible,
+.btn-primary:focus-visible {
+outline: 3px solid rgba(var(--brand-rgb)/0.25);
+outline-offset: 2px;
+}
+
 
 
   /* Ghost button */
@@ -227,10 +241,6 @@ input[type="range"]::-moz-range-thumb:focus-visible {
   background: var(--brand);
 }
 
-/* Small utility for hero spacing harmony */
-.lead {
-  @apply text-slate-600 mt-2;
-}
 
 /* ---------- Base Typography ---------- */
 @layer base {
@@ -304,85 +314,63 @@ input[type="range"]::-moz-range-thumb:focus-visible {
   outline-offset: 3px;
 }
 
-/* Full-bleed background utility (desktop and up) */
-@media (min-width: 1024px) {
-  .full-bleed {
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    width: 100vw;         /* extend background across viewport */
-  }
-}
 
-/* Hero background surface */
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;    /* never block clicks */
-  z-index: 0;
-}
-
-/* Subtle contrast lift so text never gets lost */
-.hero-contrast {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.88) 0%,
-    rgba(255,255,255,0.70) 40%,
-    rgba(255,255,255,0.52) 100%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Make sure the content sits above the background layers */
-.hero-content {
-  position: relative;
-  z-index: 2;
-}
+/* --- HERO: single source of truth --- */
 
 /* Full-bleed background pinned to the section’s height */
-.full-bleed-abs {
-  position: absolute;   /* anchor to the <section> */
-  inset: 0;
-  z-index: 0;
-}
-@media (min-width: 1024px) {
-  .full-bleed-abs {
-    /* stretch horizontally to the viewport while staying vertically
-       the height of the section */
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-  }
+.full-bleed-abs { position:absolute; inset:0; z-index:0; }
+@media (min-width:1024px){
+  .full-bleed-abs { left:50%; right:50%; margin-left:-50vw; margin-right:-50vw; }
 }
 
-/* Background layers */
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;          /* art layer */
-}
+/* Art layer + contrast wash */
+.hero-bg { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
 .hero-contrast {
-  position: absolute;
-  inset: 0;
-  z-index: 1;          /* wash above art, below content */
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,.92) 0%,
-    rgba(255,255,255,.78) 45%,
-    rgba(255,255,255,.60) 100%
-  );
+  position: absolute; 
+  inset: 0; 
+  z-index: 1; 
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(248, 250, 252, 0.95) 0%,    /* Match your --bg color */
+    rgba(248, 250, 252, 0.85) 30%,
+    rgba(248, 250, 252, 0.70) 60%,
+    rgba(248, 250, 252, 0.50) 100%);
   backdrop-filter: blur(1px);
 }
 
-/* Content sits above everything */
-.hero-content {
+/* Content above the layers */
+.hero-content { position:relative; z-index:2; }
+
+/* Use on pages that need the first section to sit flush under the header */
+.home-flush > section:first-of-type {
+  display: flow-root;
+  margin-top: 1px !important; /* Small gap to show header border */
+  padding-top: 0 !important;
+  border-top: none !important;
+}
+
+/* Stop top-margin collapse on the very first section in pages using <main class="home-flush"> */
+.home-flush > section:first-of-type {
+  display: flow-root;
+  margin-top: 0 !important; /* MAKE MORE EXPLICIT */
+  padding-top: 0 !important; /* ADD THIS */
+  border-top: none !important; /* ADD THIS */
+}
+
+/* Override main padding when it contains home-flush content */
+main:has(.home-flush) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Option 5: Simple but effective - just a better shadow */
+header {
   position: relative;
-  z-index: 2;
+  z-index: 10; /* Ensure header stays above hero */
+  background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent for modern look */
+  backdrop-filter: blur(8px); /* Glass effect */
+  border-bottom: 1px solid var(--border);
+  box-shadow: 
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }

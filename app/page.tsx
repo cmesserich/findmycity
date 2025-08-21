@@ -12,37 +12,29 @@ const PRESETS = [
 
 export default function HomePage() {
   return (
-    <main>
-      {/* HERO — full-bleed, bold, and accessible */}
-<section className="relative isolate">
-  {/* Full-bleed wrapper (desktop only) */}
-  <div className="full-bleed-abs">
-    {/* Background surface (absolute, contains the art) */}
-    <div className="hero-bg">
-      {/* Rotated micro-grid, softened + feathered */}
-      <svg
-  aria-hidden="true"
-  className="pointer-events-none absolute left-1/2 top-[-6%] h-[140%] w-[120%] -translate-x-1/2 -rotate-[3deg] opacity-[0.2]
-             [mask-image:radial-gradient(70%_60%_at_50%_35%,_#000_60%,_transparent_100%)]
-             [-webkit-mask-image:radial-gradient(70%_60%_at_50%_35%,_#000_60%,_transparent_100%)]"
-  viewBox="0 0 100 100"
-  preserveAspectRatio="none"
->
-  <defs>
-    <pattern id="cs-grid" width="4" height="8" patternUnits="userSpaceOnUse">
-      <path d="M 8 0 L 0 0 0 8" fill="none" stroke="currentColor" strokeWidth="1" />
-    </pattern>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#cs-grid)" style={{ color: "var(--brand)" }} />
-</svg>
-
-    </div>
-
-    {/* Single contrast wash so copy never gets lost */}
-    <div className="hero-contrast" />
+    <main className="home-flush">
+     <section className="relative isolate flow-root">
+  {/* HERO — full-bleed, bold, and accessible */}
+  {/* background art and wash, pinned to section height */}
+  <div className="full-bleed-abs hero-bg">
+    {/* Rotated micro-grid (soft feather) */}
+    <svg
+      aria-hidden="true"
+      className="pointer-events-none absolute left-1/2 top-[-6%] h-[140%] w-[120%] -translate-x-1/2 -rotate-[3deg] opacity-[0.24]
+                 [mask-image:radial-gradient(70%_60%_at_50%_35%,_#000_60%,_transparent_100%)]"
+      viewBox="0 0 100 100" preserveAspectRatio="none"
+    >
+      <defs>
+        <pattern id="cs-grid" width="4" height="8" patternUnits="userSpaceOnUse">
+          <path d="M 8 0 L 0 0 0 8" fill="none" stroke="currentColor" strokeWidth="0.6" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#cs-grid)" style={{ color: "var(--brand)" }} />
+    </svg>
   </div>
+  <div className="full-bleed-abs hero-contrast" />
 
-  {/* Constrained content stays in your normal section width */}
+  {/* constrained content */}
   <div className="section hero-content py-14 md:py-20">
     <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900 max-w-3xl">
       Pick two cities. See your life side-by-side.
@@ -52,14 +44,15 @@ export default function HomePage() {
     </p>
 
     <div className="mt-6 flex flex-wrap gap-2">
-      <Link href="/compare" className="btn btn-primary shadow-md">Compare Cities</Link>
-      <Link href="/wizard" className="btn btn-white shadow-sm ring-1 ring-[color:var(--border)]">Find Your City</Link>
+      <Link href="/wizard" className="btn btn-primary shadow-md">Find Your City</Link>
+      <Link href="/compare" className="btn btn-white shadow-sm ring-1 ring-[color:var(--border)]">Compare Cities</Link>
       <Link href="/snapshot" className="btn btn-outline">City Scouting Report</Link>
     </div>
 
     <p className="mt-3 text-xs text-slate-700">No account needed · Free to start</p>
   </div>
 </section>
+
 
 
 

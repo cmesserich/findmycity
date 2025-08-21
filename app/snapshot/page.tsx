@@ -83,7 +83,7 @@ export default async function SnapshotPage({
           <Link href="/wizard" className="btn btn-outline">
             Find Your City
           </Link>
-          <Link href="/" className="btn btn-outline">
+          <Link href="/compare" className="btn btn-outline">
             Compare Cities
           </Link>
         </div>
